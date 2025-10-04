@@ -18,7 +18,7 @@ router.post("/picture", upload.single("image"), async (req, res) => {
       value: req.file.buffer,
     });
 
-    res.status(201).json({ message: "Picture saved!", pictureId: picture.id });
+    res.status(200).json({ message: "Picture saved!", pictureId: picture.id });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to save picture" });
