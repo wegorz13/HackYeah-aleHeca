@@ -6,8 +6,29 @@ const router = express.Router();
 
 // List profiles
 router.get("/profiles", async (_req, res) => {
-  const profiles = await Profile.findAll();
-  res.json(profiles);
+  const profiles = await Profile.findAll({
+    include: [{ model: User, include: [Picture] }],
+  });
+  const reviews = await Review.findAll();
+
+  const profileResponse = profiles.map((p) => {
+    const r = reviews.filter((rv) => rv.receiverId === p.id);
+    const avg = r.reduce((sum, it) => sum + it.rating, 0) / (r.length || 1);
+
+    return {
+      name: p.User.name,
+      age: p.User.age,
+      city: p.city,
+      pictures: p.User.Pictures.map((pic) => pic.value),
+      role: p.role,
+      traits: Array.isArray(p.traits) ? p.traits : [],
+      averageRating: avg || 0,
+      description: p.description || "",
+      country: p.User.country || "",
+    };
+  });
+
+  res.status(200).json(profileResponse);
 });
 
 // Check by userId + cityId
