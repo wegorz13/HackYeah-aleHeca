@@ -14,7 +14,7 @@ router.get("/user/:id", async (req,res)=>{
 
 
 // GET /api/users/:userId/pictures
-router.get("/users/:userId/pictures", async (req, res) => {
+router.get("/user/:userId/pictures", async (req, res) => {
   try {
     const userId = Number(req.params.userId);
     if (isNaN(userId)) return res.status(400).json({ error: "Invalid user ID" });
