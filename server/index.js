@@ -14,6 +14,7 @@ app.use(express.json());
 // 📦 MODEL DEFINITIONS
 // ==========================
 
+const TRAITS = ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"];
 const User = sequelize.define("User", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   email: { type: DataTypes.STRING, allowNull: false, unique: true },
@@ -31,7 +32,10 @@ const Profile = sequelize.define("Profile", {
     type: DataTypes.ENUM("mentor", "traveller", "admin"),
     allowNull: false,
   },
-  trait_ids: { type: DataTypes.JSON, allowNull: true }, // array of trait IDs
+  trait_ids: { type: DataTypes.JSON, allowNull: true , get() {
+    const value = this.getDataValue("trait_ids");
+    return value.map(trait_num=> TRAITS[trait_num]);
+  },},
 });
 
 const Match = sequelize.define("Match", {
@@ -228,21 +232,27 @@ app.post("/like", async (req, res) => {
   }
 });
 
-app.get("/profiles/:cityId", async (req, res) => {
-  const cityId = req.params.cityId;
-
-  const profiles = await Profile.findAll({
-    where: {
-      cityId: cityId,
-    },
-    include: [
-      {
-        model: User,
-        include: [{ model: Picture }],
+//pass your profile or just role and cityId
+app.get("/profiles", async (req, res) => {
+  const data = JSON.parse(req.query.params);
+  const role = data.role == "traveller" ? "mentor" : "traveller";
+    const profiles = await Profile.findAll({
+      where: {
+        role: role,
+        cityId: data.cityId
       },
-    ],
-  });
+      include: [
+        {
+          model: User,
+          include: [{ model: Picture }],
+        },
+      ],
+    });
+  
 
+    const traits = ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"];
+
+    
   res.send(profiles);
 });
 
