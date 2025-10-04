@@ -18,6 +18,28 @@ router.get("/profiles", async (_req, res) => {
   res.json(profiles);
 });
 
+router.get("/profiles/:id", async (req, res) => {
+  const userId = req.params.id;
+  const profiles = await Profile.findAll({
+    where: { userId },
+    include: { model: City },
+  });
+
+  if (!profiles) return res.status(404).send("Profile not found");
+
+  let profilesResponse = profiles.map((profile) => ({
+    profile: {
+      id: profile.id,
+      role: profile.role,
+      cityId: profile.cityId,
+      trait_ids: profile.trait_ids,
+    },
+    city: profile.City ? profile.City.name : null,
+  }));
+
+  res.json(profilesResponse);
+});
+
 // Check by userId + cityId
 router.get("/profiles/check", async (req, res) => {
   const userId = Number(req.query.userId);
