@@ -5,14 +5,20 @@ import { User } from "../models/index.js";
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
-  const { email, password, name, contact } = req.body;
+  const { email, password, name, contact, country } = req.body;
 
   try {
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser)
       return res.status(400).json({ message: "Email already in use." });
 
-    const newUser = await User.create({ email, password, name, contact });
+    const newUser = await User.create({
+      email,
+      password,
+      name,
+      contact,
+      country,
+    });
 
     res.status(201).json({
       message: "User registered successfully.",
@@ -21,6 +27,7 @@ router.post("/register", async (req, res) => {
         email: newUser.email,
         name: newUser.name,
         contact: newUser.contact,
+        country: newUser.country,
       },
     });
   } catch (error) {

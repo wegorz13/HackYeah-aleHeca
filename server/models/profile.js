@@ -8,7 +8,8 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.ENUM("mentor", "traveller", "admin"),
       allowNull: false,
     },
-    trait_ids: { type: DataTypes.JSON, allowNull: true }, // array of Trait IDs
+    traits: { type: DataTypes.JSON, allowNull: true }, // array of trait names
+    description: { type: DataTypes.TEXT, allowNull: true },
   });
   return Profile;
 };

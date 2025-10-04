@@ -1,7 +1,7 @@
 // ...existing code...
 import express from "express";
 import { Op } from "sequelize";
-import { Match, Profile, User, Picture, City, Trait } from "../models/index.js";
+import { Match, Profile, User, Picture, City } from "../models/index.js";
 
 const router = express.Router();
 
@@ -67,9 +67,6 @@ router.get("/matches/:userId", async (req, res) => {
       ],
     });
 
-    const traits = await Trait.findAll();
-    const traitMap = new Map(traits.map((t) => [t.id, t.name]));
-
     const matchedProfiles = matches.map((m) =>
       profileIds.includes(m.mentorId) ? m.Traveller : m.Mentor
     );
@@ -80,10 +77,10 @@ router.get("/matches/:userId", async (req, res) => {
       city: p.City?.name,
       pictures: p.User.Pictures.map((pic) => pic.value),
       role: p.role,
-      traits: Array.isArray(p.trait_ids)
-        ? p.trait_ids.map((id) => traitMap.get(id)).filter(Boolean)
-        : [],
+      traits: Array.isArray(p.traits) ? p.traits : [],
       contact: p.User.contact,
+      description: p.description || "",
+      country: p.User.country || "",
     }));
 
     res.json(response);

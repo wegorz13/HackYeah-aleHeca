@@ -8,6 +8,7 @@ import defineReview from "./review.js";
 import defineTrait from "./trait.js";
 import defineCity from "./city.js";
 import definePicture from "./picture.js";
+import defineCountry from "./country.js";
 
 const sequelize = new Sequelize("sqlite::memory:", { logging: false });
 
@@ -19,6 +20,7 @@ const Review = defineReview(sequelize, DataTypes);
 const Trait = defineTrait(sequelize, DataTypes);
 const City = defineCity(sequelize, DataTypes);
 const Picture = definePicture(sequelize, DataTypes);
+const Country = defineCountry(sequelize, DataTypes);
 
 // Associations
 User.hasMany(Profile, { foreignKey: "userId" });
@@ -42,5 +44,15 @@ Match.belongsTo(Profile, { foreignKey: "mentorId", as: "Mentor" });
 Profile.hasMany(Match, { foreignKey: "travellerId", as: "TravellerMatches" });
 Profile.hasMany(Match, { foreignKey: "mentorId", as: "MentorMatches" });
 
-export { sequelize, User, Profile, Match, Review, Trait, City, Picture };
+export {
+  sequelize,
+  User,
+  Profile,
+  Match,
+  Review,
+  Trait,
+  City,
+  Picture,
+  Country,
+};
 // ...existing code...

@@ -8,6 +8,7 @@ import {
   Trait,
   City,
   Picture,
+  Country,
 } from "../models/index.js";
 
 export default async function seedDatabase() {
@@ -18,12 +19,14 @@ export default async function seedDatabase() {
     Array.from({ length: 10 }).map((_, i) => ({ name: `City ${i + 1}` }))
   );
 
-  // Traits
-  const traits = await Trait.bulkCreate(
-    ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"].map((t) => ({
-      name: t,
-    }))
+  // Countries
+  const countries = await Country.bulkCreate(
+    Array.from({ length: 10 }).map((_, i) => ({ name: `Country ${i + 1}` }))
   );
+
+  // Traits (names)
+  const traitNames = ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"];
+  await Trait.bulkCreate(traitNames.map((t) => ({ name: t })));
 
   // Users + Pictures
   const users = [];
@@ -38,31 +41,34 @@ export default async function seedDatabase() {
         phoneNumber: faker.phone.number("+1-###-###-####"),
         email: faker.internet.email(),
       },
+      country: faker.helpers.arrayElement(countries).name,
     });
 
     await Picture.bulkCreate(
       Array.from({ length: 3 }).map(() => ({
         userId: user.id,
-        value: faker.image.url(), // string URL
+        value: faker.image.url(),
       }))
     );
 
     users.push(user);
   }
 
-  // Profiles (1 per user; adjust as needed)
+  // Profiles store trait names directly
   const profiles = [];
   for (const user of users) {
     const randomCity = faker.helpers.arrayElement(cities);
-    const randomTraits = faker.helpers
-      .arrayElements(traits, { min: 1, max: 3 })
-      .map((t) => t.id);
+    const traitsForProfile = faker.helpers.arrayElements(traitNames, {
+      min: 1,
+      max: 3,
+    });
 
     const profile = await Profile.create({
       userId: user.id,
       cityId: randomCity.id,
       role: faker.helpers.arrayElement(["mentor", "traveller"]),
-      trait_ids: randomTraits,
+      traits: traitsForProfile, // names
+      description: faker.lorem.sentence(),
     });
 
     profiles.push(profile);
