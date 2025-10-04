@@ -21,7 +21,7 @@ export const Trips = () => {
         <div className="justify-begin flex max-w-89 flex-col items-center items-start gap-4 p-4 font-bold">
             Planing my trips
             {profiles.map((profile) => (
-                <Trip onClick={onClick} city={profile.city} role={profile.profile.role}></Trip>
+                <Trip onClick={onClick} city={profile.city} role={profile.role}></Trip>
             ))}
         </div>
     );
