@@ -16,7 +16,7 @@ createRoot(document.getElementById("root")!).render(
                 <RouteProvider>
                     <Routes>
                         <Route path="/" element={<HomeScreen />} />\
-                        <Route path="/explorer" element={<Explorer city="ola" profiles = {profiles}/>} />
+                        <Route path="/explorer" element={<Explorer city="ola"/>} />
                         <Route path="/" element={<HomeScreen />} />
                         <Route path="/profile" element={<Profile />} />
                     </Routes>
