@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
 import { Sequelize, DataTypes } from "sequelize";
-import {faker} from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 dotenv.config();
 
 const sequelize = new Sequelize("sqlite::memory:", {
@@ -9,7 +9,6 @@ const sequelize = new Sequelize("sqlite::memory:", {
 });
 const app = express();
 app.use(express.json());
-
 
 // ==========================
 // 📦 MODEL DEFINITIONS
@@ -20,52 +19,72 @@ const User = sequelize.define("User", {
   email: { type: DataTypes.STRING, allowNull: false, unique: true },
   password: { type: DataTypes.STRING, allowNull: false },
   name: { type: DataTypes.STRING, allowNull: false },
-  pictures: { type: DataTypes.BLOB("long"), allowNull: true },
 });
 
 const Profile = sequelize.define("Profile", {
-  profileId: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   userId: { type: DataTypes.INTEGER, allowNull: false },
   cityId: { type: DataTypes.INTEGER },
-  role: { type: DataTypes.ENUM("mentor", "mentee", "admin"), allowNull: false },
+  role: {
+    type: DataTypes.ENUM("mentor", "traveller", "admin"),
+    allowNull: false,
+  },
   trait_ids: { type: DataTypes.JSON, allowNull: true }, // array of trait IDs
 });
 
 const Match = sequelize.define("Match", {
-  matchId: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   mentorId: { type: DataTypes.INTEGER },
-  userId: { type: DataTypes.INTEGER },
+  travellerId: { type: DataTypes.INTEGER },
   receivedPositive: { type: DataTypes.BOOLEAN, defaultValue: false },
   expirationStamp: { type: DataTypes.DATE },
 });
 
 const Review = sequelize.define("Review", {
-  reviewId: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   authorId: { type: DataTypes.INTEGER },
-  userId: { type: DataTypes.INTEGER },
+  receiverId: { type: DataTypes.INTEGER },
   message: { type: DataTypes.TEXT },
-  role: { type: DataTypes.ENUM("mentor", "mentee") },
+  role: { type: DataTypes.ENUM("mentor", "traveller") },
   rating: { type: DataTypes.INTEGER, validate: { min: 1, max: 5 } },
 });
 
 const Trait = sequelize.define("Trait", {
-  traitId: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   name: { type: DataTypes.STRING, allowNull: false },
+});
+
+const City = sequelize.define("City", {
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  name: { type: DataTypes.STRING, allowNull: false },
+});
+
+const Picture = sequelize.define("Picture", {
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  userId: { type: DataTypes.INTEGER },
+  value: { type: DataTypes.BLOB, allowNull: false },
 });
 
 // ==========================
 // 🔗 RELATIONSHIPS
 // ==========================
-User.hasOne(Profile, { foreignKey: "userId" });
+User.hasMany(Profile, { foreignKey: "userId" });
 Profile.belongsTo(User, { foreignKey: "userId" });
 
-User.hasMany(Review, { foreignKey: "userId" });
-Review.belongsTo(User, { foreignKey: "userId" });
+User.hasMany(Review, { foreignKey: "authorId", as: "AuthoredReviews" });
+User.hasMany(Review, { foreignKey: "receiverId", as: "ReceivedReviews" });
+Review.belongsTo(User, { foreignKey: "authorId" });
+Review.belongsTo(User, { foreignKey: "receiverId" });
 
-User.hasMany(Match, { foreignKey: "userId" });
-Match.belongsTo(User, { foreignKey: "userId", as: "Mentee" });
+User.hasMany(Picture, { foreignKey: "userId" });
+Picture.belongsTo(User, { foreignKey: "userId" });
 
-Match.belongsTo(User, { foreignKey: "mentorId", as: "Mentor" });
+Profile.belongsTo(City, { foreignKey: "cityId" });
+City.hasMany(Profile, { foreignKey: "cityId" });
+
+Profile.hasMany(Match, { foreignKey: "userId" });
+Match.belongsTo(Profile, { foreignKey: "travellerId", as: "Traveller" });
+Match.belongsTo(Profile, { foreignKey: "mentorId", as: "Mentor" });
 
 // ==========================
 // 🌱 MOCK SEED DATA
@@ -75,9 +94,9 @@ async function seedDatabase() {
 
   // Traits
   const traits = await Trait.bulkCreate(
-    ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"].map(
-      (t) => ({ name: t })
-    )
+    ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"].map((t) => ({
+      name: t,
+    }))
   );
 
   // Users
@@ -94,13 +113,13 @@ async function seedDatabase() {
 
   // Profiles
   for (const user of users) {
-    const randomTraits = faker.helpers.arrayElements(traits, 2).map(
-      (t) => t.traitId
-    );
+    const randomTraits = faker.helpers
+      .arrayElements(traits, 2)
+      .map((t) => t.traitId);
     await Profile.create({
       userId: user.id,
       cityId: faker.number.int({ min: 1, max: 100 }),
-      role: faker.helpers.arrayElement(["mentor", "mentee"]),
+      role: faker.helpers.arrayElement(["mentor", "traveller"]),
       trait_ids: randomTraits,
     });
   }
@@ -121,7 +140,7 @@ async function seedDatabase() {
       authorId: faker.helpers.arrayElement(users).id,
       userId: faker.helpers.arrayElement(users).id,
       message: faker.lorem.sentences(2),
-      role: faker.helpers.arrayElement(["mentor", "mentee"]),
+      role: faker.helpers.arrayElement(["mentor", "traveller"]),
       rating: faker.number.int({ min: 1, max: 5 }),
     });
   }
@@ -141,15 +160,14 @@ app.get("/users", async (_, res) => res.json(await User.findAll()));
 app.get("/profiles", async (_, res) => res.json(await Profile.findAll()));
 app.get("/traits", async (_, res) => res.json(await Trait.findAll()));
 
-app.get("/matches/:mentorId",async (req,res)=>{
-
+app.get("/matches/:mentorId", async (req, res) => {
   const mentorId = req.params.mentorId;
-  const travellers = await Match.findOne({ where:{
-    mentorId:mentorId
-  },
-  include:[{model:User, as:"Mentee"}]
-
-});
+  const travellers = await Match.findOne({
+    where: {
+      mentorId: mentorId,
+    },
+    include: [{ model: User, as: "Traveller" }],
+  });
 
   res.send(travellers);
 });
