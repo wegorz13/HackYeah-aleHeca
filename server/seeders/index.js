@@ -65,7 +65,7 @@ export default async function seedDatabase() {
 
     const profile = await Profile.create({
       userId: user.id,
-      cityId: randomCity.id,
+      city: randomCity.name,
       role: faker.helpers.arrayElement(["mentor", "traveller"]),
       traits: traitsForProfile, // names
       description: faker.lorem.sentence(),

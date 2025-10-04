@@ -471,8 +471,8 @@ app.post("/login", async (req, res) => {
   res.status(200).send(user.id);
 });
 
-const PORT = 3000;
-app.listen(PORT, async () => {
-  await initDatabase();
-  console.log(`✅ Server running: http://localhost:${PORT}`);
-});
+// const PORT = 3000;
+// app.listen(PORT, async () => {
+//   await initDatabase();
+//   console.log(`✅ Server running: http://localhost:${PORT}`);
+// });

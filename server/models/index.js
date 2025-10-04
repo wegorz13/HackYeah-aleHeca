@@ -29,9 +29,6 @@ Profile.belongsTo(User, { foreignKey: "userId" });
 User.hasMany(Picture, { foreignKey: "userId" });
 Picture.belongsTo(User, { foreignKey: "userId" });
 
-Profile.belongsTo(City, { foreignKey: "cityId" });
-City.hasMany(Profile, { foreignKey: "cityId" });
-
 // Reviews reference users (matches your usage in /profiles/search)
 User.hasMany(Review, { foreignKey: "authorId", as: "AuthoredReviews" });
 User.hasMany(Review, { foreignKey: "receiverId", as: "ReceivedReviews" });
