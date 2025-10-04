@@ -9,6 +9,7 @@ import {
   City,
   Trait,
 } from "../models/index.js";
+import country from "../models/country.js";
 
 const router = express.Router();
 
@@ -16,6 +17,27 @@ const router = express.Router();
 router.get("/profiles", async (_req, res) => {
   const profiles = await Profile.findAll();
   res.json(profiles);
+});
+
+router.get("/profiles/:id", async (req, res) => {
+  const userId = req.params.id;
+  const profiles = await Profile.findAll({
+    where: { userId: userId },
+    include: [{ model: City }],
+  });
+
+  if (!profiles) return res.status(404).send("Profile not found");
+
+  let profilesResponse = profiles.map((profile) => ({
+    id: profile.id,
+    role: profile.role,
+    cityId: profile.cityId,
+    trait_ids: profile.trait_ids,
+    description: profile.description,
+    city: profile.City ? profile.City.name : null,
+  }));
+
+  res.json(profilesResponse);
 });
 
 // Check by userId + cityId
@@ -69,6 +91,8 @@ router.get("/profiles/search", async (req, res) => {
           ? p.trait_ids.map((id) => traitMap.get(id)).filter(Boolean)
           : [],
         averageRating: avg || 0,
+        description: p.description || "",
+        country: p.User.country || "",
       };
     });
 
@@ -81,9 +105,15 @@ router.get("/profiles/search", async (req, res) => {
 
 // Create profile
 router.post("/profiles", async (req, res) => {
-  const { userId, cityId, role, trait_ids } = req.body;
+  const { userId, cityId, role, trait_ids, description } = req.body;
   try {
-    const profile = await Profile.create({ userId, cityId, role, trait_ids });
+    const profile = await Profile.create({
+      userId,
+      cityId,
+      role,
+      trait_ids,
+      description,
+    });
     res.status(201).json(profile);
   } catch (error) {
     console.error(error);

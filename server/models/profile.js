@@ -9,6 +9,7 @@ export default (sequelize, DataTypes) => {
       allowNull: false,
     },
     trait_ids: { type: DataTypes.JSON, allowNull: true }, // array of Trait IDs
+    description: { type: DataTypes.TEXT, allowNull: true },
   });
   return Profile;
 };

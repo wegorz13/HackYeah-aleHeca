@@ -8,6 +8,7 @@ import {
   Trait,
   City,
   Picture,
+  Country,
 } from "../models/index.js";
 
 export default async function seedDatabase() {
@@ -16,6 +17,11 @@ export default async function seedDatabase() {
   // Cities
   const cities = await City.bulkCreate(
     Array.from({ length: 10 }).map((_, i) => ({ name: `City ${i + 1}` }))
+  );
+
+  // Countries
+  const countries = await Country.bulkCreate(
+    Array.from({ length: 10 }).map((_, i) => ({ name: `Country ${i + 1}` }))
   );
 
   // Traits
@@ -38,6 +44,7 @@ export default async function seedDatabase() {
         phoneNumber: faker.phone.number("+1-###-###-####"),
         email: faker.internet.email(),
       },
+      country: faker.helpers.arrayElement(countries).name,
     });
 
     await Picture.bulkCreate(
@@ -63,6 +70,7 @@ export default async function seedDatabase() {
       cityId: randomCity.id,
       role: faker.helpers.arrayElement(["mentor", "traveller"]),
       trait_ids: randomTraits,
+      description: faker.lorem.sentence(),
     });
 
     profiles.push(profile);
