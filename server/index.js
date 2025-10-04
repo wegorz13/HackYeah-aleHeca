@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import express from "express";
-import { Sequelize, DataTypes, Op } from "sequelize";
+import { Sequelize, DataTypes, Op, where } from "sequelize";
 import { faker, tr } from "@faker-js/faker";
 dotenv.config();
 
@@ -14,7 +14,7 @@ app.use(express.json());
 // 📦 MODEL DEFINITIONS
 // ==========================
 
-const TRAITS = ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"];
+//const TRAITS = ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"];
 const User = sequelize.define("User", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   email: { type: DataTypes.STRING, allowNull: false, unique: true },
@@ -32,10 +32,10 @@ const Profile = sequelize.define("Profile", {
     type: DataTypes.ENUM("mentor", "traveller", "admin"),
     allowNull: false,
   },
-  trait_ids: { type: DataTypes.JSON, allowNull: true , get() {
-    const value = this.getDataValue("trait_ids");
-    return value.map(trait_num=> TRAITS[trait_num]);
-  },},
+  trait_ids: {
+    type: DataTypes.JSON,
+    allowNull: true,
+  },
 });
 
 const Match = sequelize.define("Match", {
@@ -232,28 +232,64 @@ app.post("/like", async (req, res) => {
   }
 });
 
+app.get("/profiles/check", async (req, res) => {
+  const { userId, cityId } = req.query;
+  const profile = await Profile.findOne(
+    where({
+      userId: userId,
+      cityId: cityId,
+    })
+  );
+
+  if (!profile) return res.status(404).send("Profile not found");
+  res.json(profile.id);
+});
+
 //pass your profile or just role and cityId
-app.get("/profiles", async (req, res) => {
-  const data = JSON.parse(req.query.params);
-  const role = data.role == "traveller" ? "mentor" : "traveller";
-    const profiles = await Profile.findAll({
-      where: {
-        role: role,
-        cityId: data.cityId
+app.get("/profiles/search", async (req, res) => {
+  const profile = JSON.parse(req.query.profile);
+  const role = profile.role == "traveller" ? "mentor" : "traveller";
+  const profiles = await Profile.findAll({
+    where: {
+      role: role,
+      cityId: profile.cityId,
+    },
+    include: [
+      {
+        model: User,
+        include: [{ model: Picture }],
       },
-      include: [
-        {
-          model: User,
-          include: [{ model: Picture }],
-        },
-      ],
-    });
-  
+    ],
+  });
 
-    const traits = ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"];
+  const reviews = await Review.findAll(
+    where({ receiverId: { [Op.in]: [profiles.map((p) => p.id)] } })
+  );
 
-    
-  res.send(profiles);
+  const cities = await City.findAll();
+  const traits = await Trait.findAll();
+
+  const profileResponse = profiles.map((p) => {
+    const averageRating =
+      reviews
+        .filter((r) => r.receiverId === p.id)
+        .reduce((sum, r) => sum + r.rating, 0) /
+      (reviews.filter((r) => r.receiverId === p.id).length || 1);
+
+    return {
+      name: p.User.name,
+      age: p.User.age,
+      city: cities.find((c) => c.id === p.cityId)?.name,
+      pictures: p.User.Pictures.map((pic) => pic.value),
+      role: p.role,
+      traits: traits
+        .filter((trait) => p.trait_ids.includes(trait.id))
+        .map((t) => t.name),
+      averageRating: averageRating || 0,
+    };
+  });
+
+  res.json(profileResponse);
 });
 
 app.get("/matches/:userId", async (req, res) => {
@@ -335,6 +371,95 @@ app.get("/matches/:userId", async (req, res) => {
   }
 });
 
+app.post("/profiles", async (req, res) => {
+  const { userId, cityId, role, trait_ids } = req.body;
+  try {
+    const profile = await Profile.create({
+      userId,
+      cityId,
+      role,
+      trait_ids,
+    });
+    res.status(201).json(profile);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while creating the profile." });
+  }
+});
+
+app.post("/review", async (req, res) => {
+  const { authorId, receiverId, message, role, rating } = req.body;
+
+  try {
+    // Create a new review
+    const review = await Review.create({
+      authorId,
+      receiverId,
+      message,
+      role,
+      rating,
+    });
+
+    res.status(201).json(review);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while submitting the review." });
+  }
+});
+
+app.post("/picture", async (req, res) => {
+  const { userId, value } = req.body;
+  try {
+    const picture = await Picture.create({ userId, value });
+    res.status(201).json(picture);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while uploading the picture." });
+  }
+});
+
+app.post("/register", async (req, res) => {
+  const { email, password, name, contact } = req.body;
+
+  try {
+    // Check if the email already exists in the database
+    const existingUser = await User.findOne({ where: { email } });
+
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already in use." });
+    }
+
+    // Create a new user
+    const newUser = await User.create({
+      email,
+      password, // In a real app, hash the password before saving
+      name,
+      contact,
+    });
+
+    res.status(201).json({
+      message: "User registered successfully.",
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        name: newUser.name,
+        contact: newUser.contact,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while registering the user." });
+  }
+});
+
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({
@@ -344,7 +469,7 @@ app.post("/login", async (req, res) => {
     },
   });
 
-  res.send(user.id);
+  res.status(200).send(user.id);
 });
 
 const PORT = 3000;
