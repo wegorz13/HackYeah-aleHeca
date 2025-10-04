@@ -62,10 +62,10 @@ router.get("/profiles/search", async (req, res) => {
       //mentos look:
       if(profileArg.role == "mentor"){
       const matches = await Match.findAll({
-        where: { mentorId: profileArg.mentorId ,receivedPositive: true },
+        where: { mentorId: profileArg.mentorId ,receivedPositive: false },
         attributes: ["travellerId"],
       });
-      
+
       const travellersList = matches.map(m=> m.travellerId);
       console.log(travellersList);
         profiles = await Profile.findAll({ where: { userId: { [Op.in]: travellersList }, city: profileArg.city }, include: [{ model: User, include: [Picture] }], });
