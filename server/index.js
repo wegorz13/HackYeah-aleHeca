@@ -75,7 +75,7 @@ async function seedDatabase() {
 
   // Traits
   const traits = await Trait.bulkCreate(
-    ["Empathetic", "Analytical", "Creative", "Organized", "Communicative"].map(
+    ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"].map(
       (t) => ({ name: t })
     )
   );
@@ -140,6 +140,19 @@ async function initDatabase() {
 app.get("/users", async (_, res) => res.json(await User.findAll()));
 app.get("/profiles", async (_, res) => res.json(await Profile.findAll()));
 app.get("/traits", async (_, res) => res.json(await Trait.findAll()));
+
+app.get("/matches/:mentorId",async (req,res)=>{
+
+  const mentorId = req.params.mentorId;
+  const travellers = await Match.findOne({ where:{
+    mentorId:mentorId
+  },
+  include:[{model:User, as:"Mentee"}]
+
+});
+
+  res.send(travellers);
+});
 
 const PORT = 3000;
 app.listen(PORT, async () => {
