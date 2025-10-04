@@ -7,21 +7,21 @@ export const Trips = () => {
     };
     const userId = 2;
 
-    const [matches, setMatches] = useState([]);
+    const [profiles, setProfiles] = useState([]);
 
     useEffect(() => {
-        fetch(`http://localhost:3000/matches/${userId}`)
+        fetch(`http://localhost:3000/profiles/${userId}`)
             .then((res) => res.json())
-            .then((data) => setMatches(data))
+            .then((data) => setProfiles(data))
             .catch((err) => console.error(err));
     }, [userId]);
 
-    console.log(matches);
+    console.log(profiles[0]);
     return (
         <div className="justify-begin flex max-w-89 flex-col items-center items-start gap-4 p-4 font-bold">
-            My trips
-            {matches.map((match) => (
-                <Trip onClick={onClick} city={match.city} withName={match.name}></Trip>
+            Planing my trips
+            {profiles.map((profile) => (
+                <Trip onClick={onClick} city={profile.city} role={profile.profile.role}></Trip>
             ))}
         </div>
     );
