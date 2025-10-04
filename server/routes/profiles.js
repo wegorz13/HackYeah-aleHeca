@@ -10,34 +10,13 @@ router.get("/profiles", async (_req, res) => {
   res.json(profiles);
 });
 
-router.get("/profiles/:id", async (req, res) => {
-  const userId = req.params.id;
-  const profiles = await Profile.findAll({
-    where: { userId: userId },
-    include: [{ model: City }],
-  });
-
-  if (!profiles) return res.status(404).send("Profile not found");
-
-  let profilesResponse = profiles.map((profile) => ({
-    id: profile.id,
-    role: profile.role,
-    cityId: profile.cityId,
-    traits: profile.traits || [],
-    description: profile.description,
-    city: profile.City ? profile.City.name : null,
-  }));
-
-  res.json(profilesResponse);
-});
-
 // Check by userId + cityId
 router.get("/profiles/check", async (req, res) => {
   const userId = Number(req.query.userId);
-  const cityId = Number(req.query.cityId);
+  const city = Number(req.query.city);
 
   const profile = await Profile.findOne({
-    where: { userId, cityId },
+    where: { userId, city },
   });
 
   if (!profile) return res.status(404).send("Profile not found");
@@ -48,6 +27,7 @@ router.get("/profiles/check", async (req, res) => {
 router.get("/profiles/search", async (req, res) => {
   try {
     const profileArg = req.query.profile ? JSON.parse(req.query.profile) : null;
+    console.log("Parsed profileArg:", profileArg); // Debug log
     if (!profileArg)
       return res.status(400).json({ message: "Missing profile query param" });
 
@@ -55,8 +35,8 @@ router.get("/profiles/search", async (req, res) => {
       profileArg.role === "traveller" ? "mentor" : "traveller";
 
     const profiles = await Profile.findAll({
-      where: { role: oppositeRole, cityId: profileArg.cityId },
-      include: [{ model: User, include: [Picture] }, { model: City }],
+      where: { role: oppositeRole, city: profileArg.city },
+      include: [{ model: User, include: [Picture] }],
     });
 
     const profileIds = profiles.map((p) => p.id);
@@ -72,7 +52,7 @@ router.get("/profiles/search", async (req, res) => {
       return {
         name: p.User.name,
         age: p.User.age,
-        city: p.City?.name,
+        city: p.city,
         pictures: p.User.Pictures.map((pic) => pic.value),
         role: p.role,
         traits: Array.isArray(p.traits) ? p.traits : [],
@@ -82,7 +62,7 @@ router.get("/profiles/search", async (req, res) => {
       };
     });
 
-    res.json(profileResponse);
+    res.status(200).json(profileResponse);
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Failed to search profiles" });
@@ -91,11 +71,11 @@ router.get("/profiles/search", async (req, res) => {
 
 // Create profile
 router.post("/profiles", async (req, res) => {
-  const { userId, cityId, role, traits, description } = req.body; // traits are names now
+  const { userId, city, role, traits, description } = req.body; // traits are names now
   try {
     const profile = await Profile.create({
       userId,
-      cityId,
+      city,
       role,
       traits, // store names directly
       description,
@@ -107,6 +87,25 @@ router.post("/profiles", async (req, res) => {
       .status(500)
       .json({ message: "An error occurred while creating the profile." });
   }
+});
+
+router.get("/profiles/:id", async (req, res) => {
+  const userId = req.params.id;
+  const profiles = await Profile.findAll({
+    where: { userId: userId },
+  });
+
+  if (!profiles) return res.status(404).send("Profile not found");
+
+  let profilesResponse = profiles.map((profile) => ({
+    id: profile.id,
+    role: profile.role,
+    city: profile.city,
+    traits: profile.traits || [],
+    description: profile.description,
+  }));
+
+  res.json(profilesResponse);
 });
 
 export default router;

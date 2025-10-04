@@ -57,12 +57,12 @@ router.get("/matches/:userId", async (req, res) => {
         {
           model: Profile,
           as: "Traveller",
-          include: [{ model: User, include: [Picture] }, City],
+          include: [{ model: User, include: [Picture] }],
         },
         {
           model: Profile,
           as: "Mentor",
-          include: [{ model: User, include: [Picture] }, City],
+          include: [{ model: User, include: [Picture] }],
         },
       ],
     });
@@ -74,7 +74,7 @@ router.get("/matches/:userId", async (req, res) => {
     const response = matchedProfiles.map((p) => ({
       name: p.User.name,
       age: p.User.age,
-      city: p.City?.name,
+      city: p.city,
       pictures: p.User.Pictures.map((pic) => pic.value),
       role: p.role,
       traits: Array.isArray(p.traits) ? p.traits : [],
