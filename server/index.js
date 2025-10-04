@@ -92,6 +92,13 @@ Match.belongsTo(Profile, { foreignKey: "mentorId", as: "Mentor" });
 async function seedDatabase() {
   console.log("🌱 Seeding mock data...");
 
+  // Seed Cities
+  const cities = await City.bulkCreate(
+    Array.from({ length: 10 }).map((_, i) => ({
+      name: `City ${i + 1}`,
+    }))
+  );
+
   // Traits
   const traits = await Trait.bulkCreate(
     ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"].map((t) => ({
@@ -106,19 +113,20 @@ async function seedDatabase() {
         email: faker.internet.email(),
         password: faker.internet.password(),
         name: faker.person.fullName(),
-        pictures: Buffer.from(faker.image.dataUri({ width: 100, height: 100 })), // Mock binary blob
       });
     })
   );
 
   // Profiles
   for (const user of users) {
+    const randomCity = faker.helpers.arrayElement(cities); // Pick a valid city
     const randomTraits = faker.helpers
       .arrayElements(traits, 2)
-      .map((t) => t.traitId);
+      .map((t) => t.id); // Use valid trait IDs
+
     await Profile.create({
       userId: user.id,
-      cityId: faker.number.int({ min: 1, max: 100 }),
+      cityId: randomCity.id, // Use a valid city ID
       role: faker.helpers.arrayElement(["mentor", "traveller"]),
       trait_ids: randomTraits,
     });
@@ -128,7 +136,7 @@ async function seedDatabase() {
   for (let i = 0; i < 5; i++) {
     await Match.create({
       mentorId: faker.helpers.arrayElement(users).id,
-      userId: faker.helpers.arrayElement(users).id,
+      travellerId: faker.helpers.arrayElement(users).id,
       receivedPositive: faker.datatype.boolean(),
       expirationStamp: faker.date.future(),
     });
@@ -138,7 +146,7 @@ async function seedDatabase() {
   for (let i = 0; i < 10; i++) {
     await Review.create({
       authorId: faker.helpers.arrayElement(users).id,
-      userId: faker.helpers.arrayElement(users).id,
+      receiverId: faker.helpers.arrayElement(users).id,
       message: faker.lorem.sentences(2),
       role: faker.helpers.arrayElement(["mentor", "traveller"]),
       rating: faker.number.int({ min: 1, max: 5 }),
@@ -220,19 +228,22 @@ app.get("/profiles/:cityId", async (req, res) => {
   res.send(profiles);
 });
 
-app.get("/matches/:mentorId", async (req, res) => {
-  const mentorId = req.params.mentorId;
-  const matches = await Match.findAll({
-    where: {
-      mentorId: mentorId,
-    },
-    include: [{ model: Profile, as: "Traveller" }],
-  });
+// app.get("/matches/:profileId", async (req, res) => {
+//   const profileId = req.params.profileId;
+//   const matches = await Match.findAll({
+//     where: {
+//       [Op.or]: [{ mentorId: profileId }, { travellerId: profileId }],
+//     },
+//     include: [
+//       { model: Profile, as: "Traveller" },
+//       { model: Profile, as: "Mentor" },
+//     ],
+//   });
 
-  const travellers = matches.map((m) => m.Traveller);
+//   const travellers = matches.map((m) => m.Traveller);
 
-  res.send(travellers);
-});
+//   res.send(travellers);
+// });
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
