@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
-import { Sequelize, DataTypes } from "sequelize";
-import { faker } from "@faker-js/faker";
+import { Sequelize, DataTypes, Op } from "sequelize";
+import { faker, tr } from "@faker-js/faker";
 dotenv.config();
 
 const sequelize = new Sequelize("sqlite::memory:", {
@@ -19,6 +19,8 @@ const User = sequelize.define("User", {
   email: { type: DataTypes.STRING, allowNull: false, unique: true },
   password: { type: DataTypes.STRING, allowNull: false },
   name: { type: DataTypes.STRING, allowNull: false },
+  name: { type: DataTypes.JSON, allowNull: true },
+  age: { type: DataTypes.INTEGER, allowNull: true },
 });
 
 const Profile = sequelize.define("Profile", {
@@ -109,11 +111,27 @@ async function seedDatabase() {
   // Users
   const users = await Promise.all(
     Array.from({ length: 10 }).map(async () => {
-      return User.create({
+      const user = await User.create({
         email: faker.internet.email(),
         password: faker.internet.password(),
         name: faker.person.fullName(),
+        age: faker.number.int({ min: 18, max: 70 }),
+        contact: {
+          instagram: faker.person.firstName(),
+          phoneNumber: faker.phone.number("+1-###-###-####"),
+          email: faker.internet.email(),
+        },
       });
+
+      // Seed Pictures for each user
+      await Picture.bulkCreate(
+        Array.from({ length: 3 }).map(() => ({
+          userId: user.id,
+          value: faker.lorem.sentences(2), // Mock picture URL
+        }))
+      );
+
+      return user;
     })
   );
 
@@ -228,22 +246,84 @@ app.get("/profiles/:cityId", async (req, res) => {
   res.send(profiles);
 });
 
-// app.get("/matches/:profileId", async (req, res) => {
-//   const profileId = req.params.profileId;
-//   const matches = await Match.findAll({
-//     where: {
-//       [Op.or]: [{ mentorId: profileId }, { travellerId: profileId }],
-//     },
-//     include: [
-//       { model: Profile, as: "Traveller" },
-//       { model: Profile, as: "Mentor" },
-//     ],
-//   });
+app.get("/matches/:userId", async (req, res) => {
+  const userId = req.params.userId;
 
-//   const travellers = matches.map((m) => m.Traveller);
+  try {
+    // Step 1: Find all profiles for the given userId
+    const userProfiles = await Profile.findAll({
+      where: { userId },
+    });
 
-//   res.send(travellers);
-// });
+    // Extract profile IDs
+    const profileIds = userProfiles.map((profile) => profile.id);
+
+    // Step 2: Find all matches where the user's profiles are either mentor or traveller
+    const matches = await Match.findAll({
+      where: {
+        [Op.or]: [
+          { mentorId: { [Op.in]: profileIds } },
+          { travellerId: { [Op.in]: profileIds } },
+        ],
+      },
+      include: [
+        {
+          model: Profile,
+          as: "Traveller",
+          include: [
+            {
+              model: User,
+              include: [{ model: Picture }],
+            },
+          ],
+        },
+        {
+          model: Profile,
+          as: "Mentor",
+          include: [
+            {
+              model: User,
+              include: [{ model: Picture }],
+            },
+          ],
+        },
+      ],
+    });
+
+    const cities = await City.findAll();
+    const traits = await Trait.findAll();
+
+    // Step 3: Extract profiles of matched people
+    const matchedProfiles = matches.map((match) => {
+      // Determine the matched profile (opposite of the user's profile)
+      const matchedProfile = profileIds.includes(match.mentorId)
+        ? match.Traveller
+        : match.Mentor;
+
+      return matchedProfile;
+    });
+
+    const profileResponse = matchedProfiles.map((profile) => {
+      return {
+        name: profile.User.name,
+        age: profile.User.age,
+        city: cities.find((city) => city.id === profile.cityId)?.name,
+        pictures: profile.User.Pictures.map((pic) => pic.value),
+        role: profile.role,
+        traits: traits
+          .filter((trait) => profile.trait_ids.includes(trait.id))
+          .map((t) => t.name),
+        contact: profile.User.contact,
+      };
+    });
+
+    // Step 4: Send the matched profiles with pictures in the response
+    res.json(profileResponse);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching matches.");
+  }
+});
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
