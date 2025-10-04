@@ -10,15 +10,16 @@ const upload = multer({ storage: multer.memoryStorage() });
 // POST /api/picture
 router.post("/picture", upload.single("image"), async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { userId, order } = req.body;
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
     const picture = await Picture.create({
       userId: userId,
       value: req.file.buffer,
+      order: order ?? 0
     });
 
-    res.status(200).json({ message: "Picture saved!", pictureId: picture.id });
+    res.status(200).json({ message: "Picture saved!", pictureId: picture.id , order:order});
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to save picture" });
