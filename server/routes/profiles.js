@@ -1,15 +1,6 @@
-// ...existing code...
 import express from "express";
 import { Op } from "sequelize";
-import {
-  Profile,
-  User,
-  Picture,
-  Review,
-  City,
-  Trait,
-} from "../models/index.js";
-import country from "../models/country.js";
+import { Profile, User, Picture, Review, City } from "../models/index.js";
 
 const router = express.Router();
 
@@ -32,7 +23,7 @@ router.get("/profiles/:id", async (req, res) => {
     id: profile.id,
     role: profile.role,
     cityId: profile.cityId,
-    trait_ids: profile.trait_ids,
+    traits: profile.traits || [],
     description: profile.description,
     city: profile.City ? profile.City.name : null,
   }));
@@ -74,9 +65,6 @@ router.get("/profiles/search", async (req, res) => {
       where: { receiverId: { [Op.in]: profileIds } },
     });
 
-    const traits = await Trait.findAll();
-    const traitMap = new Map(traits.map((t) => [t.id, t.name]));
-
     const profileResponse = profiles.map((p) => {
       const r = reviews.filter((rv) => rv.receiverId === p.id);
       const avg = r.reduce((sum, it) => sum + it.rating, 0) / (r.length || 1);
@@ -87,9 +75,7 @@ router.get("/profiles/search", async (req, res) => {
         city: p.City?.name,
         pictures: p.User.Pictures.map((pic) => pic.value),
         role: p.role,
-        traits: Array.isArray(p.trait_ids)
-          ? p.trait_ids.map((id) => traitMap.get(id)).filter(Boolean)
-          : [],
+        traits: Array.isArray(p.traits) ? p.traits : [],
         averageRating: avg || 0,
         description: p.description || "",
         country: p.User.country || "",
@@ -105,13 +91,13 @@ router.get("/profiles/search", async (req, res) => {
 
 // Create profile
 router.post("/profiles", async (req, res) => {
-  const { userId, cityId, role, trait_ids, description } = req.body;
+  const { userId, cityId, role, traits, description } = req.body; // traits are names now
   try {
     const profile = await Profile.create({
       userId,
       cityId,
       role,
-      trait_ids,
+      traits, // store names directly
       description,
     });
     res.status(201).json(profile);
@@ -124,4 +110,3 @@ router.post("/profiles", async (req, res) => {
 });
 
 export default router;
-// ...existing code...
