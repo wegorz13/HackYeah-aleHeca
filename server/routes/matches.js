@@ -84,6 +84,8 @@ router.get("/matches/:userId", async (req, res) => {
         ? p.trait_ids.map((id) => traitMap.get(id)).filter(Boolean)
         : [],
       contact: p.User.contact,
+      description: p.description || "",
+      country: p.User.country || "",
     }));
 
     res.json(response);
