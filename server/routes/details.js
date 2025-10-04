@@ -22,15 +22,14 @@ router.get("/user/:userId/pictures", async (req, res) => {
 
     const pictures = await Picture.findAll({
       where: { userId },
-      attributes: ["id"], // only select the IDs
+      attributes: ["id", "order"], // only select the IDs
     });
 
     if (!pictures.length) {
       return res.status(404).json({ error: "No pictures found for this user" });
     }
 
-    // Map results to an array of IDs
-    const pictureIds = pictures.map((pic) => pic.id);
+    const pictureIds = pictures.map((pic) => ({id: pic.id, order:pic.order}) );
 
     res.json({ userId, pictureIds });
   } catch (err) {
