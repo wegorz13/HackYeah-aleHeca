@@ -71,8 +71,13 @@ router.get("/profiles/search", async (req, res) => {
       console.log("Found mentor profiles:");
       console.log(profiles);
     } else {
+      const matches = await Match.findAll({
+        where: { travellerId: profileId },
+        attributes: ["mentorId"],
+      });
+      const mentorsList = matches.map((m) => m.mentorId);
       profiles = await Profile.findAll({
-        where: { role: "mentor", city: city },
+        where: { role: "mentor", city: city, id: { [Op.notIn]: mentorsList } },
         include: [{ model: User, include: [Picture] }],
       });
       console.log("Found traveller profiles:");
@@ -100,7 +105,7 @@ router.get("/profiles/search", async (req, res) => {
         description: p.description || "",
         country: p.User.country || "",
         date: p.date || "",
-        profileId: p.id,
+        id: p.id,
       };
     });
 
