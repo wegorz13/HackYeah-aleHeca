@@ -23,7 +23,7 @@ export const YourTrips = () => {
     console.log(profiles[0]);
     return (
         <div className="justify-begin flex max-w-89 flex-col items-center items-start gap-4 p-4 font-bold">
-            Your trips
+            Saved trips
             {profiles.length > 0 && (
                 <div
                     className={
