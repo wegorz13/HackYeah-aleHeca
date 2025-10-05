@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, User01 } from "@untitledui/icons";
+import { useNavigate } from "react-router";
 import { Tabs } from "@/components/application/tabs/tabs";
+import { Avatar } from "@/components/base/avatar/avatar";
+import { Button } from "@/components/base/buttons/button";
 import { useUser } from "@/providers/id-provider";
 import { Match } from "./match";
-import { Avatar } from "@/components/base/avatar/avatar";
 
 // Shape returned by the server /matches/:userId route
 type ApiMatch = {
@@ -36,6 +38,11 @@ export const Matches = () => {
     const [avatarSrc, setAvatarSrc] = useState<string | null>(null); // added
     const [matches, setMatches] = useState<ApiMatch[]>([]);
     const [selectedTab, setSelectedTab] = useState<"traveling" | "guiding">("traveling");
+    const navigate = useNavigate();
+
+    const onClick = () => {
+        navigate("/profile");
+    };
 
     useEffect(() => {
         fetch(`http://localhost:3000/matches/${userId}`)
@@ -85,18 +92,18 @@ export const Matches = () => {
 
     return (
         <div className="flex max-w-89 flex-col items-center justify-center p-4">
-            <div className="relative w-full flex items-center justify-center rounded-3xl px-4 py-3 shadow-[0_8px_12px_-6px_rgba(0,0,0,0.25)]">
+            <div className="relative flex w-full items-center justify-center rounded-3xl px-4 py-3 shadow-[0_8px_12px_-6px_rgba(0,0,0,0.25)]">
                 <div className="flex w-full items-center justify-center p-1">
                     <button onClick={() => (window.location.href = "/")} className="rounded-full p-2 hover:bg-gray-100">
                         <ArrowLeft className="h-5 w-5" />
                     </button>
-                    <div className="flex flex-1 justify-center">
-                        Matches
-                    </div>
-                    {avatarSrc ? <Avatar size="md" alt="User" src={avatarSrc} /> : <User01 />}
+                    <div className="flex flex-1 justify-center">Matches</div>
+                    <Button color="link-gray" noTextPadding={true} onClick={onClick}>
+                        {avatarSrc ? <Avatar size="md" alt="User" src={avatarSrc} /> : <User01 />}
+                    </Button>
                 </div>
             </div>
-            
+
             <div className="mx-auto flex w-full max-w-89 flex-col items-center p-4">
                 {/* Connected horizontal tabs centered */}
                 <div className="mb-4 flex w-full justify-center">

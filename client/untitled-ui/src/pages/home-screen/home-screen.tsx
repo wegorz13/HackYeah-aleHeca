@@ -18,7 +18,6 @@ export const HomeScreen = () => {
     }, []);
 
     const onSelect = (value) => {
-        console.log(value);
         navigate(`/create-profile/${value.label}`);
     };
 

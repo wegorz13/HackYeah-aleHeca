@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, MarkerPin01, User01 } from "@untitledui/icons";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { LoadingIndicator } from "@/components/application/loading-indicator/loading-indicator";
 import { Avatar } from "@/components/base/avatar/avatar";
 import { Button } from "@/components/base/buttons/button";
@@ -13,9 +13,14 @@ type ProfileItem = { id: number } & Record<string, any>;
 export const Explorer = () => {
     const [profiles, setProfiles] = useState<ProfileItem[]>([]);
     const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
-    const userId = useUser();
+    const { userId } = useUser();
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+
+    const onClick = () => {
+        navigate("/profile");
+    }
 
     const { state } = useLocation() as { state?: { city: string; role: string; profileId: number } };
 
@@ -98,7 +103,7 @@ export const Explorer = () => {
         <div className="rows items-center justify-center gap-2">
             <div className="shadow-gray-1000/1000 m-2 m-7 rounded-3xl bg-white shadow-md">
                 <div className="flex w-full items-center justify-center p-1">
-                    <button onClick={() => (window.location.href = "/")} className="rounded-full p-2 hover:bg-gray-100">
+                    <button onClick={() => (window.history.back())} className="rounded-full p-2 hover:bg-gray-100">
                         <ArrowLeft className="h-5 w-5" />
                     </button>
                     <div className="flex flex-1 justify-center">
@@ -107,8 +112,9 @@ export const Explorer = () => {
                             {state.city}
                         </span>
                     </div>
+                <Button color="link-gray" noTextPadding={true} onClick={onClick}>
                     {avatarSrc ? <Avatar size="md" alt="User" src={avatarSrc} /> : <User01 />}
-                </div>
+                </Button>                </div>
             </div>
             <div className="row flex items-center justify-center">
                 <UserCard profil={profiles[0]}></UserCard>
