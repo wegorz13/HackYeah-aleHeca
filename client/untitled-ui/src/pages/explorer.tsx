@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { MarkerPin01 } from "@untitledui/icons";
-import { ArrowLeft } from "@untitledui/icons";
+import { MarkerPin01, ArrowLeft, User01 } from "@untitledui/icons";
 import { useLocation } from "react-router";
 import { LoadingIndicator } from "@/components/application/loading-indicator/loading-indicator";
 import { Avatar } from "@/components/base/avatar/avatar";
@@ -10,6 +9,8 @@ import { UserCard } from "@/components/user_card.tsx";
 export const Explorer = (prompts: any) => {
     const [profiles, setProfiles] = useState([]);
     const [index, setIndex] = useState(0);
+    const [avatarSrc, setAvatarSrc] = useState<string | null>(null); // added
+    const USER_ID = 2; // hardcoded (adjust if needed)
     const [message, setMessage] = useState("");
 
     const { state } = useLocation() as { state?: { city: string; role: string; profileId: number } };
@@ -33,6 +34,23 @@ export const Explorer = (prompts: any) => {
             .catch((err) => console.error("Błąd przy pobieraniu:", err));
     }, []);
 
+    // Fetch avatar picture (first image id) like HomeScreenHeader
+    useEffect(() => {
+        let active = true;
+        (async () => {
+            try {
+                const res = await fetch(`http://localhost:3000/user/${USER_ID}/pictures`);
+                if (!res.ok) return;
+                const json = await res.json();
+                let list: any[] = [];
+                if (Array.isArray(json)) list = json; else if (Array.isArray(json.pictureIds)) list = json.pictureIds; else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
+                const ids = list.map((d:any)=> (typeof d === 'number' ? d : d?.id)).filter((id:any)=> typeof id === 'number');
+                if (ids.length > 0 && active) setAvatarSrc(`http://localhost:3000/picture/${ids[0]}`);
+            } catch (_) { /* silent */ }
+        })();
+        return () => { active = false; };
+    }, []);
+
     if (profiles.length === 0) {
         if (message) {
             return <div className="text-center text-lg font-medium text-gray-500">{message}</div>;
@@ -49,7 +67,7 @@ export const Explorer = (prompts: any) => {
     };
 
     return (
-        <div className="rows items-center justify-center gap-2">
+        <div className="max-w-89 rows items-center justify-center gap-2">
             <div className="shadow-gray-1000/1000 m-7 rounded-3xl bg-white shadow-md">
                 <div className="flex w-full items-center justify-center p-1">
                     <button onClick={() => (window.location.href = "/")} className="rounded-full p-2 hover:bg-gray-100">
@@ -61,7 +79,7 @@ export const Explorer = (prompts: any) => {
                             {state.city}
                         </span>
                     </div>
-                    <Avatar size="sm" alt="Olivia Rhye" src="https://www.untitledui.com/images/avatars/olivia-rhye?fm=webp&q=80" />
+                    {avatarSrc ? <Avatar size="md" alt="User" src={avatarSrc} /> : <User01 />}
                 </div>
             </div>
             <div className="row flex items-center justify-center">
