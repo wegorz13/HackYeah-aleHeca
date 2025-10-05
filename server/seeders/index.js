@@ -199,6 +199,10 @@ export default async function seedDatabase() {
   for (let i = 0; i < 40; i++) {
     const a = faker.helpers.arrayElement(profiles);
     let b = faker.helpers.arrayElement(profiles);
+    while (b.role !== "traveller") {
+      b = faker.helpers.arrayElement(profiles);
+    }
+
     let guard = 0;
     while ((b.id === a.id || a.role === b.role) && guard < 10) {
       b = faker.helpers.arrayElement(profiles);
