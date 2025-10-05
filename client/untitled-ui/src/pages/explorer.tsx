@@ -21,6 +21,7 @@ export const Explorer = (prompts: any) => {
         profileId: state.profileId.toString(),
     });
 
+    console.log("Navigation state:", state, queryParams, profiles);
     useEffect(() => {
         fetch(`http://localhost:3000/profiles/search?${queryParams.toString()}`)
             .then((res) => res.json())
