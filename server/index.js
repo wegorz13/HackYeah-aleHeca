@@ -9,6 +9,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.use(cors());
 // Register all routes at root (keeps original endpoints like /users, /profiles, etc.)
