@@ -7,6 +7,7 @@ import { ProgressBar } from "@/components/base/progress-indicators/progress-indi
 import { FirstStep } from "./first-step";
 import { SecondStep } from "./second-step";
 import { ThirdStep } from "./third-step";
+import { useNavigate } from "react-router";
 
 export const CreateProfile = () => {
     const { city } = useParams();
@@ -22,13 +23,17 @@ export const CreateProfile = () => {
     const [leaving, setLeaving] = useState("");
     const [additionalInfo, setAditionalInfo] = useState("");
     const [chosenTraits, setChosenTraits] = useState([""]);
+    const [profileId, setProfileId] = useState(0);
+
+    const navigate = useNavigate();
+    const navigateExplorer = () => navigate("/explorer", { state: { city, role:"traveller", profileId } });
 
     function saveData() {
         const profileData = {
             userId: 2,
             city,
             date: [arriving, leaving].join(" - "),
-            role: "traveler",
+            role: "traveller",
             traits: chosenTraits,
             description: additionalInfo,
         };
@@ -41,11 +46,11 @@ export const CreateProfile = () => {
             body: JSON.stringify(profileData),
         })
             .then((res) => res.json())
-            .then((data) => {
-                console.log(" Saved:", data);
-            });
-            
-    }
+            .then((data) => { setProfileId(data.id); console.log(data.id) ; navigateExplorer(); })
+                
+            };
+
+    
 
     const goNext = () => {
         if (third) {
