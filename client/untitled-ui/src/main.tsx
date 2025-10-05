@@ -20,7 +20,7 @@ createRoot(document.getElementById("root")!).render(
                     <UserProvider initialUserId={2}>
                         <Routes>
                             <Route path="/" element={<HomeScreen />} />
-                            <Route path="/explorer" element={<Explorer city="City 4" />} />
+                            <Route path="/explorer" element={<Explorer />} />
                             <Route path="/" element={<HomeScreen />} />
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/chat/:userId/:receiverId" element={<Chat />} />

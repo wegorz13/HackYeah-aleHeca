@@ -19,15 +19,15 @@ export default async function seedDatabase() {
     [
       "Tokyo",
       "Rio de Janeiro",
-      "Toronto",
-      "Berlin",
-      "Cape Town",
-      "Mumbai",
-      "Sydney",
-      "Rome",
-      "Mexico City",
-      "Cairo"
-    ].map((n) => ({ name: n}))
+      //   "Toronto",
+      //   "Berlin",
+      //   "Cape Town",
+      //   "Mumbai",
+      //   "Sydney",
+      //   "Rome",
+      //   "Mexico City",
+      //   "Cairo"
+    ].map((n) => ({ name: n }))
   );
 
   // Countries
@@ -42,8 +42,8 @@ export default async function seedDatabase() {
       "Australia",
       "Italy",
       "Mexico",
-      "Egypt"
-    ].map((n) => ({ name:  n}))
+      "Egypt",
+    ].map((n) => ({ name: n }))
   );
 
   // Traits (names)
