@@ -68,11 +68,15 @@ router.get("/profiles/search", async (req, res) => {
         where: { userId: { [Op.in]: travellersList }, city: city },
         include: [{ model: User, include: [Picture] }],
       });
+      console.log("Found mentor profiles:");
+      console.log(profiles);
     } else {
       profiles = await Profile.findAll({
         where: { role: "mentor", city: city },
         include: [{ model: User, include: [Picture] }],
       });
+      console.log("Found traveller profiles:");
+      console.log(profiles);
     }
 
     const profileIds = profiles.map((p) => p.id);
@@ -96,6 +100,7 @@ router.get("/profiles/search", async (req, res) => {
         description: p.description || "",
         country: p.User.country || "",
         date: p.date || "",
+        profileId: p.id,
       };
     });
 
