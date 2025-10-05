@@ -46,6 +46,7 @@ export const Explorer = () => {
 
     // Fetch avatar picture (first image id) like HomeScreenHeader
     useEffect(() => {
+        if (userId == null) return;
         let active = true;
         (async () => {
             try {
@@ -65,7 +66,7 @@ export const Explorer = () => {
         return () => {
             active = false;
         };
-    }, []);
+    }, [userId]);
 
     if (loading) {
         return (
