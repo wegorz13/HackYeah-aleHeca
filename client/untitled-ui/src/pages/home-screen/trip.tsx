@@ -1,16 +1,15 @@
+import { useNavigate } from "react-router";
 import { Button } from "@/components/base/buttons/button";
 
 type TripParams = {
     city: string;
     role: string;
-    onClick?: () => void;
+    profileId: number;
 };
 
-export function Trip({
-    city,
-    role,
-    onClick,
-}: TripParams) {
+export function Trip({ city, role, profileId }: TripParams) {
+    const navigate = useNavigate();
+    const onClick = () => navigate("/explorer", { state: { city, role, profileId } });
     return (
         <Button onClick={onClick} className={"justify-begin flex w-full flex-col rounded-2xl border border-gray-200 bg-white p-6 text-left"}>
             <div>
