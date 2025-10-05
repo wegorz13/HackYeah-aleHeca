@@ -6,7 +6,6 @@ type SecondStepProps = {
 }
 
 
-<<<<<<< HEAD
 type SecondStepProps = {
 
  
@@ -22,7 +21,6 @@ export const SecondStep = ({}: SecondStepProps) => {
       
       </div>
     </>
-=======
 export const SecondStep = ({chosenTraits, setChosenTraits} : SecondStepProps) => {
 
     const [traits, setTraits] = useState([]);
@@ -73,7 +71,6 @@ export const SecondStep = ({chosenTraits, setChosenTraits} : SecondStepProps) =>
                 ))}
             </div>
         </div>
->>>>>>> 45924ac411b6ab1bf79d15a045e9fad219adca33
     );
 }
  
