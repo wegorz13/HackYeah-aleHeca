@@ -5,6 +5,7 @@ import { LoadingIndicator } from "@/components/application/loading-indicator/loa
 import { Avatar } from "@/components/base/avatar/avatar";
 import { Button } from "@/components/base/buttons/button";
 import { UserCard } from "@/components/user_card.tsx";
+import {useUser} from "@/providers/id-provider.tsx";
 
 // Minimal profile type (must include id)
 type ProfileItem = { id: number } & Record<string, any>;
@@ -13,6 +14,11 @@ export const Explorer = () => {
     const [profiles, setProfiles] = useState<ProfileItem[]>([]);
     const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
     const USER_ID = 2; // hardcoded (adjust if needed)
+export const Explorer = (prompts: any) => {
+    const [profiles, setProfiles] = useState([]);
+    const [index, setIndex] = useState(0);
+    const [avatarSrc, setAvatarSrc] = useState<string | null>(null); // added
+    const USER_ID =  useUser();
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(true);
 
