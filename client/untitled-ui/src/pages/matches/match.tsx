@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react"; // added useEffect/useState
 import { useNavigate } from "react-router";
+import { Avatar } from "@/components/base/avatar/avatar";
 
 type MatchParams = {
     name: string;
@@ -7,18 +8,53 @@ type MatchParams = {
     description?: string;
     currentUserId: number;
     userId: number;
-    // Optional UI extras for the card
-    avatarUrl?: string;
-    cityTag?: string; // e.g. "Rijeka"
-    date?: string; // e.g. "18.09"
+    avatarUrl?: any; // was string; server may send array or id
+    cityTag?: string;
+    date?: string;
     online?: boolean;
 };
 
 export function Match({ name, role, description, currentUserId, userId, avatarUrl, cityTag, date, online = true }: MatchParams) {
     const navigate = useNavigate();
+    const [autoAvatar, setAutoAvatar] = useState<string | null>(null);
+
+    // Decide if provided avatarUrl is already a usable image reference
+    let directAvatar: string | null = null;
+    const isUsableUrl = (s: string) => s.startsWith('http://') || s.startsWith('https://') || s.startsWith('data:image/');
+
+    if (typeof avatarUrl === 'string') {
+        if (/^\d+$/.test(avatarUrl)) {
+            // treat as picture id string
+            directAvatar = `http://localhost:3000/picture/${avatarUrl}`;
+        } else if (isUsableUrl(avatarUrl)) {
+            directAvatar = avatarUrl;
+        }
+    } else if (typeof avatarUrl === 'number') {
+        directAvatar = `http://localhost:3000/picture/${avatarUrl}`;
+    } // ignore arrays / objects (likely raw byte arrays from backend) -> will fallback to fetch
+
+    // Fetch first picture for this user if no explicit valid avatar
+    useEffect(() => {
+        if (directAvatar) return; // we already have a valid image
+        let active = true;
+        (async () => {
+            try {
+                const res = await fetch(`http://localhost:3000/user/${userId}/pictures`);
+                if (!res.ok) return;
+                const json = await res.json();
+                let list: any[] = [];
+                if (Array.isArray(json)) list = json; else if (Array.isArray(json.pictureIds)) list = json.pictureIds; else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
+                const ids = list.map((d:any) => (typeof d === 'number' ? d : d?.id)).filter((id:any) => typeof id === 'number');
+                if (active && ids.length > 0) setAutoAvatar(`http://localhost:3000/picture/${ids[0]}`);
+            } catch { /* silent */ }
+        })();
+        return () => { active = false; };
+    }, [directAvatar, userId]);
 
     const openChat = () => navigate(`/chat/${currentUserId}/${userId}`);
-    console.log(date);
+    const displayAvatar = directAvatar || autoAvatar;
+    const initials = name?.charAt(0)?.toUpperCase() || "?";
+
     return (
         <div
             onClick={openChat}
@@ -26,16 +62,8 @@ export function Match({ name, role, description, currentUserId, userId, avatarUr
         >
             {/* Avatar */}
             <div className="relative">
-                {avatarUrl ? (
-                    <img src={avatarUrl} alt={`${name} avatar`} className="h-12 w-12 rounded-full object-cover" />
-                ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold text-gray-700">
-                        {name?.charAt(0)?.toUpperCase() || "?"}
-                    </div>
-                )}
-                <span className={`absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full ring-2 ring-white ${online ? "bg-emerald-500" : "bg-gray-300"}`} />
+                <Avatar size="lg" src={displayAvatar || undefined} initials={!displayAvatar ? initials : undefined} status={online ? 'online' : 'offline'} />
             </div>
-
             {/* Main content */}
             <div className="flex min-w-0 flex-1 items-start gap-2">
                 <div className="min-w-0 flex-1">
