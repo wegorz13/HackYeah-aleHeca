@@ -1,34 +1,34 @@
-import {MarkerPin01} from "@untitledui/icons";
-import {UserCard} from "@/components/user_card.tsx";
-import { Button } from "@/components/base/buttons/button";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
+import { MarkerPin01 } from "@untitledui/icons";
+import { ArrowLeft } from "@untitledui/icons";
+import { useLocation } from "react-router";
 import { LoadingIndicator } from "@/components/application/loading-indicator/loading-indicator";
 import { Avatar } from "@/components/base/avatar/avatar";
-import {ArrowLeft} from "@untitledui/icons";
+import { Button } from "@/components/base/buttons/button";
+import { UserCard } from "@/components/user_card.tsx";
 
-export const Explorer =  (prompts: any) => {
+export const Explorer = (prompts: any) => {
     const [profiles, setProfiles] = useState([]);
-    const [profile, setProfile] = useState([]);
     const [index, setIndex] = useState(0);
 
-    useEffect(() => {
-        fetch("http://localhost:3000/profiles")
-            .then((res) => res.json())
-            .then((data)=>{
-                setProfile(data[0]);
-            })
-            .catch((err) => console.error("Błąd przy pobieraniu:", err));
-    },[]);
+    const { state } = useLocation() as { state?: { city: string; role: string; profileId: number } };
+
+    if (!state) throw new Error("Missing navigation state with city, role, profileId");
+
+    const queryParams = new URLSearchParams({
+        city: state.city,
+        role: state.role,
+        profileId: state.profileId.toString(),
+    });
 
     useEffect(() => {
-        fetch("http://localhost:3000/profiles")
+        fetch(`http://localhost:3000/profiles/search?${queryParams.toString()}`)
             .then((res) => res.json())
-            .then((data)=>{
-                const filtered = data.filter((item: { city: any; })=> item.city === prompts.city);
+            .then((data) => {
                 setProfiles(data);
             })
             .catch((err) => console.error("Błąd przy pobieraniu:", err));
-        },[]);
+    }, []);
 
     if (profiles.length === 0) {
         return (
@@ -41,38 +41,33 @@ export const Explorer =  (prompts: any) => {
         setIndex((prev) => (prev + 1) % profiles.length);
     };
 
-
     return (
         <div className="rows items-center justify-center gap-2">
-            <div className="bg-white rounded-3xl shadow-md shadow-gray-1000/1000 m-7">
-                <div className="flex items-center justify-center w-full p-1 ">
-                    <button
-                        onClick={() => window.location.href = "/"}
-                        className="p-2 rounded-full hover:bg-gray-100 ">
-                        <ArrowLeft className="w-5 h-5"/>
+            <div className="shadow-gray-1000/1000 m-7 rounded-3xl bg-white shadow-md">
+                <div className="flex w-full items-center justify-center p-1">
+                    <button onClick={() => (window.location.href = "/")} className="rounded-full p-2 hover:bg-gray-100">
+                        <ArrowLeft className="h-5 w-5" />
                     </button>
-                    <div className="flex justify-center flex-1">
-                    <span className="flex bg-neutral-100 rounded-xl px-2 py-1 gap-6 w-1/2 justify-center">
-                      <MarkerPin01/>
-                        {prompts.city}
-                    </span>
+                    <div className="flex flex-1 justify-center">
+                        <span className="flex w-1/2 justify-center gap-6 rounded-xl bg-neutral-100 px-2 py-1">
+                            <MarkerPin01 />
+                            {prompts.city}
+                        </span>
                     </div>
-                    <Avatar size="sm" alt="Olivia Rhye"
-                            src="https://www.untitledui.com/images/avatars/olivia-rhye?fm=webp&q=80"/>
+                    <Avatar size="sm" alt="Olivia Rhye" src="https://www.untitledui.com/images/avatars/olivia-rhye?fm=webp&q=80" />
                 </div>
             </div>
-            <div className="flex row items-center justify-center">
+            <div className="row flex items-center justify-center">
                 <UserCard profil={profiles[index]}></UserCard>
             </div>
             <div className="flex justify-center gap-5">
-                <Button className="bg-white border-color-grey-500 text-color-black w-9/20" onClick={() => next_profil()}>
+                <Button className="border-color-grey-500 text-color-black w-9/20 bg-white" onClick={() => next_profil()}>
                     Skip
                 </Button>
-                <Button className="bg-orange-500 border-color-500 w-9/20" onClick={() => next_profil()}>
+                <Button className="border-color-500 w-9/20 bg-orange-500" onClick={() => next_profil()}>
                     Like
                 </Button>
             </div>
-
         </div>
     );
-}
+};

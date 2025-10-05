@@ -1,6 +1,6 @@
 import express from "express";
 import { Op } from "sequelize";
-import { Profile, User, Picture, Review } from "../models/index.js";
+import { Profile, User, Picture, Review, Match } from "../models/index.js";
 
 const router = express.Router();
 
@@ -48,32 +48,29 @@ router.get("/profiles/check", async (req, res) => {
 // Search opposite role in same city, return enriched profiles
 router.get("/profiles/search", async (req, res) => {
   try {
-    const profileArg = req.query.profile ? JSON.parse(req.query.profile) : null;
-    console.log("Parsed profileArg:", profileArg); // Debug log
-    if (!profileArg)
-      return res.status(400).json({ message: "Missing profile query param" });
+    const { city, role, profileId } = req.query;
 
-    const oppositeRole =
-      profileArg.role === "traveller" ? "mentor" : "traveller";
+    if (!city || !role || !profileId)
+      return res.status(400).json({ message: "Missing profile query param" });
 
     let profiles = null;
 
     //mentos look:
-    if (profileArg.role == "mentor") {
+    if (role == "mentor") {
       const matches = await Match.findAll({
-        where: { mentorId: profileArg.mentorId, receivedPositive: false },
+        where: { mentorId: profileId, receivedPositive: false },
         attributes: ["travellerId"],
       });
 
       const travellersList = matches.map((m) => m.travellerId);
       console.log(travellersList);
       profiles = await Profile.findAll({
-        where: { userId: { [Op.in]: travellersList }, city: profileArg.city },
+        where: { userId: { [Op.in]: travellersList }, city: city },
         include: [{ model: User, include: [Picture] }],
       });
     } else {
       profiles = await Profile.findAll({
-        where: { role: oppositeRole, city: profileArg.city },
+        where: { role: "mentor", city: city },
         include: [{ model: User, include: [Picture] }],
       });
     }
