@@ -1,3 +1,10 @@
+import { TextArea } from "@/components/base/textarea/textarea";
+
+type ThirdStepProps = {
+    additionalInfo: string;
+    setAdditionalInfo: (additionalInfo: string) => void;
+ 
+};
 
 import { TextArea } from "@/components/base/textarea/textarea";
 
@@ -22,4 +29,3 @@ export const ThirdStep = ({additionalInfo, setAdditionalInfo}: ThirdStepProps) =
     </>
     );
 }
- 

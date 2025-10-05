@@ -7,6 +7,7 @@ import { ProgressBar } from "@/components/base/progress-indicators/progress-indi
 import { FirstStep } from "./first-step";
 import { SecondStep } from "./second-step";
 import { ThirdStep } from "./third-step";
+import { useNavigate } from "react-router";
 
 export const CreateProfile = () => {
     const { city } = useParams();
@@ -14,11 +15,45 @@ export const CreateProfile = () => {
     const onClick = () => {
         window.history.back();
     };
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> 45924ac411b6ab1bf79d15a045e9fad219adca33
     const [second, setSecond] = useState(false);
     const [third, setThird] = useState(false);
-  
-     const [arriving, setArriving] = useState("");
-  const [leaving, setLeaving] = useState("");
+
+    const [arriving, setArriving] = useState("");
+    const [leaving, setLeaving] = useState("");
+    const [additionalInfo, setAditionalInfo] = useState("");
+    const [chosenTraits, setChosenTraits] = useState([""]);
+    const [profileId, setProfileId] = useState(0);
+
+    const navigate = useNavigate();
+    const navigateExplorer = () => navigate("/explorer", { state: { city, role:"traveller", profileId } });
+
+    function saveData() {
+        const profileData = {
+            userId: 2,
+            city,
+            date: [arriving, leaving].join(" - "),
+            role: "traveller",
+            traits: chosenTraits,
+            description: additionalInfo,
+        };
+        console.log("💾 Saving profile data:", profileData);
+        fetch("http://localhost:3000/profiles", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(profileData),
+        })
+            .then((res) => res.json())
+            .then((data) => { setProfileId(data.id); console.log(data.id) ; navigateExplorer(); })
+                
+            };
+
+    
 
    const [additionalInfo, setAditionalInfo] = useState("");
 
@@ -47,6 +82,7 @@ export const CreateProfile = () => {
 }
 
     const goNext = () => {
+<<<<<<< HEAD
     if (third) {
         saveData();
     }
@@ -56,15 +92,26 @@ export const CreateProfile = () => {
       setSecond(true);
     }
   };
+=======
+        if (third) {
+            saveData();
+        } else if (second) {
+            setThird(true);
+        } else  {
+            setSecond(true);
+        }
+    };
+>>>>>>> 45924ac411b6ab1bf79d15a045e9fad219adca33
 
-  const goPrevious = () => {
-    if (second === false) {
-        window.history.back();
-    } else if (third === false) {
-      setSecond(false);
-    }
-    else { setThird(false); }
-  };
+    const goPrevious = () => {
+        if (second === false) {
+            window.history.back();
+        } else if (third === false) {
+            setSecond(false);
+        } else {
+            setThird(false);
+        }
+    };
 
     return (
         <div className="flex max-w-89 flex-col items-center justify-center gap-4 p-4">
@@ -76,6 +123,7 @@ export const CreateProfile = () => {
             </Badge>
             <div className="text-2xl font-bold">What are your plans for {city}?</div>
             <div className="flex w-full flex-row items-center gap-2">
+<<<<<<< HEAD
                 <ProgressBar className="bg-gray-200 [&>div]:bg-orange-500" min={0} max={100} value={100} />
                 <ProgressBar className="bg-gray-200 [&>div]:bg-orange-500" min={0} max={100} value={second ? 100 : 0} />
                 <ProgressBar className="bg-gray-200 [&>div]:bg-orange-500" min={0} max={100} value={third ? 100 : 0} />
@@ -88,6 +136,21 @@ export const CreateProfile = () => {
          
             <div className="flex w-full items-center gap-4">
                 <Button onClick={goPrevious} size="sm" className="flex-1 rounded-md border border-gray-300 bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-gray-200">
+=======
+                <ProgressBar className="bg-gray-200 [&>div]:bg-orange-500" min={0} max={100} value={ 100 } />
+                <ProgressBar className="bg-gray-200 [&>div]:bg-orange-500" min={0} max={100} value={second ? 100 : 0} />
+                <ProgressBar className="bg-gray-200 [&>div]:bg-orange-500" min={0} max={100} value={third ? 100 : 0} />
+            </div>
+            {second === false && <FirstStep arriving={arriving} setArriving={setArriving} leaving={leaving} setLeaving={setLeaving} />}
+            {second === true && third === false && <SecondStep chosenTraits={chosenTraits} setChosenTraits={setChosenTraits}/>}
+            {second === true && third === true && <ThirdStep additionalInfo={additionalInfo} setAdditionalInfo={setAditionalInfo} />}
+            <div className="absolute right-0 bottom-0 left-0 my-5 flex w-full items-center gap-4 p-4">
+                <Button
+                    onClick={goPrevious}
+                    size="sm"
+                    className="flex-1 rounded-md border border-gray-300 bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-gray-200"
+                >
+>>>>>>> 45924ac411b6ab1bf79d15a045e9fad219adca33
                     Previous
                 </Button>
 

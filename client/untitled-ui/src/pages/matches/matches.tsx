@@ -1,44 +1,88 @@
-import { useEffect, useState} from "react";
-import { Match } from "./match";
-import { Button } from "@/components/base/buttons/button";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft } from "@untitledui/icons";
+import { Tabs } from "@/components/application/tabs/tabs";
+import { Button } from "@/components/base/buttons/button";
+import { useUser } from "@/providers/id-provider";
+import { Match } from "./match";
+
+// Shape returned by the server /matches/:userId route
+type ApiMatch = {
+    name: string;
+    role: string; // "mentor" | "traveller"
+    description?: string;
+    userId: number;
+    city?: string;
+    pictures?: string[];
+    age?: number;
+    traits?: string[];
+    contact?: string;
+    country?: string;
+    date?: string;
+};
 
 export const Matches = () => {
-    const userId = 2;
-    const [matches, setMatches] = useState([]);
-   
+    const { userId } = useUser();
+    const [matches, setMatches] = useState<ApiMatch[]>([]);
+    const [selectedTab, setSelectedTab] = useState<"traveling" | "guiding">("traveling");
 
     useEffect(() => {
         fetch(`http://localhost:3000/matches/${userId}`)
             .then((res) => res.json())
-            .then((data) => setMatches(data))
+            .then((data: ApiMatch[]) => setMatches(data))
             .catch((err) => console.error(err));
-    }, []);
-    
-     const onClick = () => {
+    }, [userId]);
+
+    const onClick = () => {
         window.history.back();
     };
 
+    // Map tabs to roles returned by API
 
-    console.log(matches);
+    const tabItems = useMemo(
+        () => [
+            { id: "traveling", children: "Traveling" },
+            { id: "guiding", children: "Guiding" },
+        ],
+        [],
+    );
+
+    const filtered = useMemo(() => {
+        return selectedTab === "traveling" ? matches.filter((m) => m.role === "mentor") : matches.filter((m) => m.role === "traveller");
+    }, [matches, selectedTab]);
 
     return (
-        <div className="flex flex-col max-w-89 items-center justify-center p-4">
-            <div className="text-2xl font-bold mb-3 color-gray-800">
-            <Button
-        size="sm"
-        color="link-gray"
-        onClick={onClick}
-        className="flex absolute left-4 top-4"
-      >
-        <ArrowLeft />
-      </Button>
-            Your matches
+        <div className="flex max-w-100 flex-col items-center justify-center p-4">
+            <div className="mx-auto flex w-full max-w-100 flex-col items-center p-4">
+                <div className="color-gray-800 mb-2 text-center text-2xl font-bold">
+                    <Button size="sm" color="link-gray" onClick={onClick} className="absolute top-4 left-4 flex">
+                        <ArrowLeft />
+                    </Button>
+                    Matches
+                </div>
+
+                {/* Connected horizontal tabs centered */}
+                <div className="mb-4 flex w-full justify-center">
+                    <Tabs selectedKey={selectedTab} onSelectionChange={(key) => setSelectedTab(key as "traveling" | "guiding")} className="w-auto">
+                        <Tabs.List type="button-border" size="sm" aria-label="Match type" items={tabItems} />
+                    </Tabs>
+                </div>
             </div>
-            <div className=" flex max-w-200 w-full flex-col gap-10">
-              {matches.map((match) => (
-                <Match name={match.name} role={match.role} description={match.description} ></Match>
-              ))}
+
+            <div className="mx-auto flex w-full max-w-200 flex-col items-stretch gap-4">
+                {filtered.map((match) => (
+                    <Match
+                        key={match.userId}
+                        name={match.name}
+                        role={match.role}
+                        description={match.description}
+                        currentUserId={userId}
+                        userId={match.userId}
+                        avatarUrl={match.pictures?.[0]}
+                        cityTag={match.city}
+                        online={true}
+                        date={match.date}
+                    />
+                ))}
             </div>
         </div>
     );

@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
+import { useUser } from "@/providers/id-provider";
 import { Trip } from "./trip";
 
 export const Trips = () => {
-    const onClick = () => {
-        console.log("Trip clicked");
-    };
-    const userId = 2;
+    const { userId } = useUser();
 
     const [profiles, setProfiles] = useState([]);
 
@@ -21,7 +19,7 @@ export const Trips = () => {
         <div className="justify-begin flex max-w-89 flex-col items-center items-start gap-4 p-4 font-bold">
             Planing my trips
             {profiles.map((profile) => (
-                <Trip onClick={onClick} city={profile.city} role={profile.role}></Trip>
+                <Trip city={profile.city} role={profile.role} profileId={profile.id}></Trip>
             ))}
         </div>
     );

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useUser } from "@/providers/id-provider";
 
 interface User {
     name?: string;
@@ -14,7 +15,7 @@ interface ProfileRating {
 }
 
 export const ProfileHeader = () => {
-    const userId = 2;
+    const { userId } = useUser();
     const [user, setUser] = useState<User>({});
     const [avgRating, setAvgRating] = useState<string | null>(null);
 
