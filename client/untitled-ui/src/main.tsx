@@ -7,24 +7,27 @@ import { Explorer } from "@/pages/explorer.tsx";
 import { HomeScreen } from "@/pages/home-screen/home-screen";
 import { Matches } from "@/pages/matches/matches";
 import { Profile } from "@/pages/profil/profile";
+import { UserProvider } from "@/providers/id-provider";
 import { RouteProvider } from "@/providers/router-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import "@/styles/globals.css";
-
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <ThemeProvider>
             <BrowserRouter>
                 <RouteProvider>
-                    <Routes>
-                        <Route path="/" element={<HomeScreen />} />\
-                        <Route path="/explorer" element={<Explorer city="City 4"/>} />
-                        <Route path="/profile" element={<Profile />} />
-                        <Route path="/chat/:userId/:receiverId" element={<Chat />} />
-                        <Route path="/matches" element={<Matches />} />
-                        <Route path="/create-profile/:city" element={<CreateProfile />} />
-                    </Routes>
+                    <UserProvider initialUserId={2}>
+                        <Routes>
+                            <Route path="/" element={<HomeScreen />} />
+                            <Route path="/explorer" element={<Explorer city="City 4" />} />
+                            <Route path="/" element={<HomeScreen />} />
+                            <Route path="/profile" element={<Profile />} />
+                            <Route path="/chat/:userId/:receiverId" element={<Chat />} />
+                            <Route path="/matches" element={<Matches />} />
+                            <Route path="/create-profile/:city" element={<CreateProfile />} />
+                        </Routes>
+                    </UserProvider>
                 </RouteProvider>
             </BrowserRouter>
         </ThemeProvider>

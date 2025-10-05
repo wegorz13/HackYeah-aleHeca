@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft } from "@untitledui/icons";
 import { Tabs } from "@/components/application/tabs/tabs";
 import { Button } from "@/components/base/buttons/button";
+import { useUser } from "@/providers/id-provider";
 import { Match } from "./match";
 
 // Shape returned by the server /matches/:userId route
@@ -20,7 +21,7 @@ type ApiMatch = {
 };
 
 export const Matches = () => {
-    const userId = 2;
+    const { userId } = useUser();
     const [matches, setMatches] = useState<ApiMatch[]>([]);
     const [selectedTab, setSelectedTab] = useState<"traveling" | "guiding">("traveling");
 
