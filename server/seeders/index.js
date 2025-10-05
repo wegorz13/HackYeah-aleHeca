@@ -50,6 +50,9 @@ export default async function seedDatabase() {
   const traitNames = ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"];
   await Trait.bulkCreate(traitNames.map((t) => ({ name: t })));
 
+  // Cities
+  const dates = Array.from({ length: 10 }).map((_, i) => `Date ${i + 1}`);
+
   // Users + Pictures
   const users = [];
   for (let i = 0; i < 10; i++) {
@@ -91,6 +94,7 @@ export default async function seedDatabase() {
       role: faker.helpers.arrayElement(["mentor", "traveller"]),
       traits: traitsForProfile, // names
       description: faker.lorem.sentence(),
+      date: faker.helpers.arrayElement(dates),
     });
 
     profiles.push(profile);

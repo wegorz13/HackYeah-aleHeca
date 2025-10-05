@@ -10,6 +10,7 @@ export default (sequelize, DataTypes) => {
     },
     traits: { type: DataTypes.JSON, allowNull: true }, // array of trait names
     description: { type: DataTypes.TEXT, allowNull: true },
+    date: { type: DataTypes.TEXT, allowNull: true },
   });
   return Profile;
 };
