@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft } from "@untitledui/icons";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { io } from "socket.io-client";
+import { Avatar } from "@/components/base/avatar/avatar";
 
 const socket = io("http://localhost:3000");
 
@@ -24,6 +25,27 @@ export default function Chat() {
 
     const receiverName = location.state?.receiverName || (otherId ? `User ${otherId}` : "Chat");
     const receiverAvatar = location.state?.receiverAvatar;
+    const [fetchedAvatar, setFetchedAvatar] = useState<string | null>(null);
+
+    // Fetch first picture for receiver if not provided
+    useEffect(() => {
+        if (receiverAvatar || !otherId) return;
+        let active = true;
+        (async () => {
+            try {
+                const res = await fetch(`http://localhost:3000/user/${otherId}/pictures`);
+                if (!res.ok) return;
+                const json = await res.json();
+                let list: any[] = [];
+                if (Array.isArray(json)) list = json;
+                else if (Array.isArray(json.pictureIds)) list = json.pictureIds;
+                else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
+                const ids = list.map((d: any) => (typeof d === 'number' ? d : d?.id)).filter((id: any) => typeof id === 'number');
+                if (active && ids.length > 0) setFetchedAvatar(`http://localhost:3000/picture/${ids[0]}`);
+            } catch { /* silent */ }
+        })();
+        return () => { active = false; };
+    }, [receiverAvatar, otherId]);
 
     const navigate = useNavigate();
     const listRef = useRef<HTMLDivElement>(null);
@@ -79,7 +101,7 @@ export default function Chat() {
     const formatTime = (ts?: number) => new Date(ts ?? Date.now()).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit", hour12: true });
 
     return (
-        <div className="flex h-[100dvh] flex-col bg-white">
+        <div className="flex max-w-89 h-[100dvh] flex-col bg-white">
             {/* Header */}
             <div className="sticky top-0 z-10 border-b bg-white/90 p-4 backdrop-blur">
                 <div className="relative mx-auto flex max-w-[640px] items-center justify-center">
@@ -107,17 +129,12 @@ export default function Chat() {
                                 <div key={i} className={isMe ? "flex w-full justify-end" : "flex w-full justify-start"}>
                                     {!isMe && (
                                         <div className="mt-6 mr-2 h-8 w-8 shrink-0">
-                                            {receiverAvatar ? (
-                                                <div className="relative">
-                                                    <img src={receiverAvatar} alt={receiverName} className="h-8 w-8 rounded-full object-cover" />
-                                                    <span className="absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
-                                                </div>
-                                            ) : (
-                                                <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-xs font-semibold text-gray-700">
-                                                    {receiverName.charAt(0)}
-                                                    <span className="absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
-                                                </div>
-                                            )}
+                                            <Avatar
+                                                size="sm"
+                                                src={receiverAvatar || fetchedAvatar || undefined}
+                                                initials={(receiverName || '?').charAt(0).toUpperCase()}
+                                                status="online"
+                                            />
                                         </div>
                                     )}
 
