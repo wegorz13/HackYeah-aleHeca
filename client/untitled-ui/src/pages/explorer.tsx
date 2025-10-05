@@ -66,9 +66,23 @@ export const Explorer = (prompts: any) => {
         setIndex((prev) => (prev + 1) % profiles.length);
     };
 
+    function like(){
+        const profileId = profiles[index].id;
+
+        const response = fetch("/like",{
+            method: 'POST',
+            headers:  {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                "likerRole" : state?.role,
+                "LikerId" :
+                "ProfileId"
+            })
+        })
+    }
+
     return (
-        <div className="max-w-89 rows items-center justify-center gap-2">
-            <div className="shadow-gray-1000/1000 m-7 rounded-3xl bg-white shadow-md">
+        <div className="rows items-center justify-center gap-2">
+            <div className="shadow-gray-1000/1000 m-7 rounded-3xl bg-white shadow-md m-2">
                 <div className="flex w-full items-center justify-center p-1">
                     <button onClick={() => (window.location.href = "/")} className="rounded-full p-2 hover:bg-gray-100">
                         <ArrowLeft className="h-5 w-5" />
@@ -85,8 +99,13 @@ export const Explorer = (prompts: any) => {
             <div className="row flex items-center justify-center">
                 <UserCard profil={profiles[index]}></UserCard>
             </div>
-            <div className="flex justify-center gap-5">
-                <Button className="border-color-grey-500 text-color-black w-9/20 bg-white" onClick={() => next_profil()}>
+            <div className="absolute right-0 bottom-0 left-0 my-5 flex w-full items-center gap-4 p-4">
+                <Button className="border-color-grey-500 text-color-black w-9/20 bg-white" onClick={() =>{
+                    next_profil()
+                    const profileId = profiles[index];
+                    console.log(profileId)
+                    }
+                }>
                     Skip
                 </Button>
                 <Button className="border-color-500 w-9/20 bg-orange-500" onClick={() => next_profil()}>
