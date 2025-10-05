@@ -3,7 +3,7 @@
 Project built during **HackYeah 2025** by team **aleHeca**.
 
 ## Overview
-Travel companionship platform connecting travellers and locals . 
+Travel companionship platform connecting travellers and locals [(Pitch)](./presentation.pdf). 
 
 ## Tech Stack
 **Frontend**
