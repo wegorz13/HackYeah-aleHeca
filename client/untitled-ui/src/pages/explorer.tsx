@@ -12,7 +12,7 @@ export const Explorer =  (prompts: any) => {
     const [index, setIndex] = useState(0);
 
     useEffect(() => {
-        fetch("http://localhost:3000/profiles/profile")
+        fetch("http://localhost:3000/profiles")
             .then((res) => res.json())
             .then((data)=>{
                 setProfile(data[0]);
@@ -25,7 +25,7 @@ export const Explorer =  (prompts: any) => {
             .then((res) => res.json())
             .then((data)=>{
                 const filtered = data.filter((item: { city: any; })=> item.city === prompts.city);
-                setProfiles(filtered);
+                setProfiles(data);
             })
             .catch((err) => console.error("Błąd przy pobieraniu:", err));
         },[]);

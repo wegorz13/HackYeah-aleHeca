@@ -20,7 +20,6 @@ createRoot(document.getElementById("root")!).render(
                     <Routes>
                         <Route path="/" element={<HomeScreen />} />\
                         <Route path="/explorer" element={<Explorer city="City 4"/>} />
-                        <Route path="/" element={<HomeScreen />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/chat/:userId/:receiverId" element={<Chat />} />
                         <Route path="/matches" element={<Matches />} />

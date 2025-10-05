@@ -59,7 +59,7 @@ export const CreateProfile = () => {
             {second === false && <FirstStep arriving={arriving} setArriving={setArriving} leaving={leaving} setLeaving={setLeaving}/>}
             {second === true && third === false && <SecondStep />}
             {second === true && third === true && <ThirdStep />}
-            <div className="flex w-full items-center gap-4">
+            <div className="flex w-full items-center gap-4 absolute bottom-0 left-0 right-0 p-4 my-5">
                 <Button onClick={goPrevious} size="sm" className="flex-1 rounded-md border border-gray-300 bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-gray-200">
                     Previous
                 </Button>
@@ -67,6 +67,7 @@ export const CreateProfile = () => {
                 <Button onClick={goNext} size="sm" className="flex-1 rounded-md bg-orange-500 px-3 py-1 text-sm text-white hover:bg-orange-600">
                     Next
                 </Button>
+
             </div>
         </div>
     );
