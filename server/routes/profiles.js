@@ -1,6 +1,6 @@
 import express from "express";
 import { Op } from "sequelize";
-import { Profile, User, Picture, Review, City } from "../models/index.js";
+import { Profile, User, Picture, Review } from "../models/index.js";
 
 const router = express.Router();
 
@@ -25,6 +25,7 @@ router.get("/profiles", async (_req, res) => {
       averageRating: avg || 0,
       description: p.description || "",
       country: p.User.country || "",
+      date: p.date || "",
     };
   });
 
@@ -80,6 +81,7 @@ router.get("/profiles/search", async (req, res) => {
         averageRating: avg || 0,
         description: p.description || "",
         country: p.User.country || "",
+        date: p.date || "",
       };
     });
 
@@ -124,6 +126,7 @@ router.get("/profiles/:id", async (req, res) => {
     city: profile.city,
     traits: profile.traits || [],
     description: profile.description,
+    date: profile.date || "",
   }));
 
   res.json(profilesResponse);
