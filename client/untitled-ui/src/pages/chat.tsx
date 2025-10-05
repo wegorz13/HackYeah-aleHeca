@@ -23,11 +23,31 @@ export default function Chat() {
 
     const location = useLocation() as { state?: { receiverName?: string; receiverAvatar?: string } };
 
-    const receiverName = location.state?.receiverName || (otherId ? `User ${otherId}` : "Chat");
+    // Replace static receiverName with stateful value
+    const [receiverName, setReceiverName] = useState<string>(
+        location.state?.receiverName || (otherId ? `User ${otherId}` : "Chat")
+    );
     const receiverAvatar = location.state?.receiverAvatar;
-    const [fetchedAvatar, setFetchedAvatar] = useState<string | null>(null);
+    const [fetchedAvatar, setFetchedAvatar] = useState<string | null>(null); // new
 
-    // Fetch first picture for receiver if not provided
+    // Fetch receiver name from backend if otherId present (override placeholder/UI state)
+    useEffect(() => {
+        if (!otherId) return;
+        let active = true;
+        (async () => {
+            try {
+                const res = await fetch(`http://localhost:3000/user/${otherId}`);
+                if (!res.ok) return;
+                const data = await res.json();
+                if (active && data?.name && typeof data.name === 'string') {
+                    setReceiverName(data.name);
+                }
+            } catch { /* silent */ }
+        })();
+        return () => { active = false; };
+    }, [otherId]);
+
+    // Fetch receiver first photo if not passed
     useEffect(() => {
         if (receiverAvatar || !otherId) return;
         let active = true;
@@ -37,10 +57,8 @@ export default function Chat() {
                 if (!res.ok) return;
                 const json = await res.json();
                 let list: any[] = [];
-                if (Array.isArray(json)) list = json;
-                else if (Array.isArray(json.pictureIds)) list = json.pictureIds;
-                else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
-                const ids = list.map((d: any) => (typeof d === 'number' ? d : d?.id)).filter((id: any) => typeof id === 'number');
+                if (Array.isArray(json)) list = json; else if (Array.isArray(json.pictureIds)) list = json.pictureIds; else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
+                const ids = list.map((d:any)=> (typeof d === 'number' ? d : d?.id)).filter((id:any)=> typeof id === 'number');
                 if (active && ids.length > 0) setFetchedAvatar(`http://localhost:3000/picture/${ids[0]}`);
             } catch { /* silent */ }
         })();
@@ -129,12 +147,15 @@ export default function Chat() {
                                 <div key={i} className={isMe ? "flex w-full justify-end" : "flex w-full justify-start"}>
                                     {!isMe && (
                                         <div className="mt-6 mr-2 h-8 w-8 shrink-0">
-                                            <Avatar
-                                                size="sm"
-                                                src={receiverAvatar || fetchedAvatar || undefined}
-                                                initials={(receiverName || '?').charAt(0).toUpperCase()}
-                                                status="online"
-                                            />
+                                            {receiverAvatar || fetchedAvatar ? (
+                                                <div className="relative">
+                                                    <Avatar size="sm" src={(receiverAvatar || fetchedAvatar) || undefined} initials={receiverName.charAt(0)} status="online" />
+                                                </div>
+                                            ) : (
+                                                <div className="relative">
+                                                    <Avatar size="sm" src={undefined} initials={receiverName.charAt(0)} status="online" />
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 
