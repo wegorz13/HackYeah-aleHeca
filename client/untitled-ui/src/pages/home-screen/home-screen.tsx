@@ -30,7 +30,7 @@ export const HomeScreen = () => {
             <div className="justify center flex max-w-200 flex-col gap-10">
                 
                 <HomeScreenHeader />
-                <div className="bg-gradient-to-b from-orange-400 to-orange-300 text-white p-3 pb-10 shadow-md">
+                <div className="bg-gradient-to-b from-orange-400 to-orange-300 p-3 pb-10 shadow-md">
 
                 <div className="text-center text-xl font-bold">
                     Where do you want to become <span className="text-orange-500">local?</span>
