@@ -8,6 +8,7 @@ export default (sequelize, DataTypes) => {
     age: { type: DataTypes.INTEGER, allowNull: true },
     contact: { type: DataTypes.JSON, allowNull: true },
     country: { type: DataTypes.STRING, allowNull: true },
+    
   });
   return User;
 };
