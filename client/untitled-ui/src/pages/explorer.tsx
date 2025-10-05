@@ -11,6 +11,7 @@ export const Explorer = (prompts: any) => {
     const [index, setIndex] = useState(0);
     const [avatarSrc, setAvatarSrc] = useState<string | null>(null); // added
     const USER_ID = 2; // hardcoded (adjust if needed)
+    const [message, setMessage] = useState("");
 
     const { state } = useLocation() as { state?: { city: string; role: string; profileId: number } };
 
@@ -28,6 +29,7 @@ export const Explorer = (prompts: any) => {
             .then((res) => res.json())
             .then((data) => {
                 setProfiles(data);
+                if (data.length === 0) setMessage("No profiles found");
             })
             .catch((err) => console.error("Błąd przy pobieraniu:", err));
     }, []);
@@ -50,11 +52,15 @@ export const Explorer = (prompts: any) => {
     }, []);
 
     if (profiles.length === 0) {
-        return (
-            <div className="flex flex-col items-start gap-8 md:flex-row md:gap-16">
-                <LoadingIndicator type="line-spinner" size="md" label="Loading..." />
-            </div>
-        );
+        if (message) {
+            return <div className="text-center text-lg font-medium text-gray-500">{message}</div>;
+        } else {
+            return (
+                <div className="flex flex-col items-start gap-8 md:flex-row md:gap-16">
+                    <LoadingIndicator type="line-spinner" size="md" label="Loading..." />
+                </div>
+            );
+        }
     }
     const next_profil = () => {
         setIndex((prev) => (prev + 1) % profiles.length);
@@ -70,7 +76,7 @@ export const Explorer = (prompts: any) => {
                     <div className="flex flex-1 justify-center">
                         <span className="flex w-1/2 justify-center gap-6 rounded-xl bg-neutral-100 px-2 py-1">
                             <MarkerPin01 />
-                            {prompts.city}
+                            {state.city}
                         </span>
                     </div>
                     {avatarSrc ? <Avatar size="md" alt="User" src={avatarSrc} /> : <User01 />}
