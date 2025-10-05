@@ -26,7 +26,18 @@ export default async function seedDatabase() {
   };
 
   // Cities (more realistic English city names)
-  const cityNames = unique(() => faker.location.city(), 25);
+  const cityNames = [
+    "Tokyo",
+    "Paris",
+    "Berlin",
+    "Ottawa",
+    "Canberra",
+    "Brasília",
+    "Nairobi",
+    "Seoul",
+    "Madrid",
+    "Cairo",
+  ];
   const cities = await City.bulkCreate(cityNames.map((name) => ({ name })));
 
   // Countries (real English country names)
