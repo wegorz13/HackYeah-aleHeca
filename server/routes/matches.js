@@ -1,4 +1,3 @@
-// ...existing code...
 import express from "express";
 import { Op } from "sequelize";
 import { Match, Profile, User, Picture, City } from "../models/index.js";
@@ -6,10 +5,9 @@ import { da } from "@faker-js/faker";
 
 const router = express.Router();
 
-// Like / confirm match
 router.post("/like", async (req, res) => {
   try {
-    const { likerRole, likerId, profileId } = req.body; // IDs are Profile IDs
+    const { likerRole, likerId, profileId } = req.body;
     let match;
     if (likerRole === "traveller") {
       const expirationDate = new Date();
@@ -38,7 +36,6 @@ router.post("/like", async (req, res) => {
   }
 });
 
-// Get profiles of matched people for a given userId
 router.get("/matches/:userId", async (req, res) => {
   const userId = Number(req.params.userId);
 
@@ -96,4 +93,3 @@ router.get("/matches/:userId", async (req, res) => {
 });
 
 export default router;
-// ...existing code...

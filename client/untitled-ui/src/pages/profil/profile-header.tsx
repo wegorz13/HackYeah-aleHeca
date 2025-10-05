@@ -20,12 +20,10 @@ export const ProfileHeader = () => {
     const [avgRating, setAvgRating] = useState<string | null>(null);
 
     useEffect(() => {
-        // Fetch user basic info
         fetch(`http://localhost:3000/user/${userId}`)
             .then((r) => r.json())
             .then((d) => setUser(d || {}))
             .catch((e) => console.error(e));
-        // Fetch profiles for ratings
         fetch(`http://localhost:3000/user/${userId}/profile`)
             .then((r) => r.json())
             .then((data) => {
@@ -51,7 +49,6 @@ export const ProfileHeader = () => {
                         .map(toNum)
                         .filter((n: number | null): n is number => n !== null);
                 } else {
-                    // Single object case (your JSON example) that might itself carry averageRating
                     const single = toNum(data.averageRating ?? data.avgRating ?? data.rating);
                     if (single !== null) ratings = [single];
                 }

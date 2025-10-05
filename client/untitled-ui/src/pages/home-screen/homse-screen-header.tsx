@@ -1,10 +1,9 @@
-import { Avatar } from "@/components/base/avatar/avatar";
 import { useEffect, useState } from "react";
-import { useUser } from "@/providers/id-provider";
-import { Button } from '@/components/base/buttons/button'
-import { useNavigate } from "react-router";
 import { User01 } from "@untitledui/icons";
-
+import { useNavigate } from "react-router";
+import { Avatar } from "@/components/base/avatar/avatar";
+import { Button } from "@/components/base/buttons/button";
+import { useUser } from "@/providers/id-provider";
 
 export const HomeScreenHeader = () => {
     const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
@@ -20,13 +19,11 @@ export const HomeScreenHeader = () => {
                 const json = await res.json();
                 let list: any[] = [];
                 // Accept multiple possible payload shapes
-                if (Array.isArray(json)) list = json; 
-                else if (Array.isArray(json.pictureIds)) list = json.pictureIds; 
+                if (Array.isArray(json)) list = json;
+                else if (Array.isArray(json.pictureIds)) list = json.pictureIds;
                 else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
                 // Normalize to objects with id
-                const ids = list
-                    .map((d:any) => (typeof d === 'number' ? d : d?.id))
-                    .filter((id:any) => typeof id === 'number');
+                const ids = list.map((d: any) => (typeof d === "number" ? d : d?.id)).filter((id: any) => typeof id === "number");
                 if (ids.length > 0 && active) {
                     setAvatarSrc(`http://localhost:3000/picture/${ids[0]}`);
                 }
@@ -34,12 +31,14 @@ export const HomeScreenHeader = () => {
                 // silent fail -> fallback icon
             }
         })();
-        return () => { active = false; };
+        return () => {
+            active = false;
+        };
     }, []);
 
     const onClick = () => {
         navigate("/profile");
-    }
+    };
 
     return (
         <div className="justify-begin flex max-w-89 flex-col items-center items-start p-4">

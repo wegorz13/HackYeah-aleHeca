@@ -10,11 +10,6 @@ const sequelize = new Sequelize("sqlite::memory:", {
 const app = express();
 app.use(express.json());
 
-// ==========================
-// 📦 MODEL DEFINITIONS
-// ==========================
-
-//const TRAITS = ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"];
 const User = sequelize.define("User", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   email: { type: DataTypes.STRING, allowNull: false, unique: true },
@@ -70,9 +65,6 @@ const Picture = sequelize.define("Picture", {
   value: { type: DataTypes.BLOB, allowNull: false },
 });
 
-// ==========================
-// 🔗 RELATIONSHIPS
-// ==========================
 User.hasMany(Profile, { foreignKey: "userId" });
 Profile.belongsTo(User, { foreignKey: "userId" });
 
@@ -91,27 +83,21 @@ Profile.hasMany(Match, { foreignKey: "userId" });
 Match.belongsTo(Profile, { foreignKey: "travellerId", as: "Traveller" });
 Match.belongsTo(Profile, { foreignKey: "mentorId", as: "Mentor" });
 
-// ==========================
-// 🌱 MOCK SEED DATA
-// ==========================
 async function seedDatabase() {
   console.log("🌱 Seeding mock data...");
 
-  // Seed Cities
   const cities = await City.bulkCreate(
     Array.from({ length: 10 }).map((_, i) => ({
       name: `City ${i + 1}`,
     }))
   );
 
-  // Traits
   const traits = await Trait.bulkCreate(
     ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"].map((t) => ({
       name: t,
     }))
   );
 
-  // Users
   const users = await Promise.all(
     Array.from({ length: 10 }).map(async () => {
       const user = await User.create({
@@ -126,11 +112,10 @@ async function seedDatabase() {
         },
       });
 
-      // Seed Pictures for each user
       await Picture.bulkCreate(
         Array.from({ length: 3 }).map(() => ({
           userId: user.id,
-          value: faker.lorem.sentences(2), // Mock picture URL
+          value: faker.lorem.sentences(2),
         }))
       );
 
@@ -138,22 +123,20 @@ async function seedDatabase() {
     })
   );
 
-  // Profiles
   for (const user of users) {
-    const randomCity = faker.helpers.arrayElement(cities); // Pick a valid city
+    const randomCity = faker.helpers.arrayElement(cities);
     const randomTraits = faker.helpers
       .arrayElements(traits, 2)
-      .map((t) => t.id); // Use valid trait IDs
+      .map((t) => t.id);
 
     await Profile.create({
       userId: user.id,
-      cityId: randomCity.id, // Use a valid city ID
+      cityId: randomCity.id,
       role: faker.helpers.arrayElement(["mentor", "traveller"]),
       trait_ids: randomTraits,
     });
   }
 
-  // Matches
   for (let i = 0; i < 5; i++) {
     await Match.create({
       mentorId: faker.helpers.arrayElement(users).id,
@@ -163,7 +146,6 @@ async function seedDatabase() {
     });
   }
 
-  // Reviews
   for (let i = 0; i < 10; i++) {
     await Review.create({
       authorId: faker.helpers.arrayElement(users).id,
@@ -173,21 +155,12 @@ async function seedDatabase() {
       rating: faker.number.int({ min: 1, max: 5 }),
     });
   }
-
-  // console.log("✅ Mock data seeded!");
 }
 
-// ==========================
-// 🚀 APP STARTUP
-// ==========================
 async function initDatabase() {
-  await sequelize.sync({ force: true }); // recreate schema each run
+  await sequelize.sync({ force: true });
   await seedDatabase();
 }
-
-// ==========================
-// ENDPOINTS
-// ==========================
 
 app.get("/users", async (_, res) => res.json(await User.findAll()));
 app.get("/profiles", async (_, res) => res.json(await Profile.findAll()));
@@ -201,7 +174,7 @@ app.post("/like", async (req, res) => {
 
     if (role === "traveller") {
       const expirationDate = new Date();
-      expirationDate.setDate(expirationDate.getDate() + 30); // +30 days
+      expirationDate.setDate(expirationDate.getDate() + 30);
 
       match = await Match.create({
         travellerId,
@@ -210,7 +183,6 @@ app.post("/like", async (req, res) => {
         expirationStamp: expirationDate,
       });
     } else if (role === "mentor") {
-      // Mentor "likes back" → update match
       match = await Match.findOne({
         where: { travellerId, mentorId },
       });
@@ -244,7 +216,6 @@ app.get("/profiles/check", async (req, res) => {
   res.json(profile.id);
 });
 
-//pass your profile or just role and cityId
 app.get("/profiles/search", async (req, res) => {
   const profile = JSON.parse(req.query.profile);
   const role = profile.role == "traveller" ? "mentor" : "traveller";
@@ -295,15 +266,12 @@ app.get("/matches/:userId", async (req, res) => {
   const userId = req.params.userId;
 
   try {
-    // Step 1: Find all profiles for the given userId
     const userProfiles = await Profile.findAll({
       where: { userId },
     });
 
-    // Extract profile IDs
     const profileIds = userProfiles.map((profile) => profile.id);
 
-    // Step 2: Find all matches where the user's profiles are either mentor or traveller
     const matches = await Match.findAll({
       where: {
         [Op.or]: [
@@ -338,9 +306,7 @@ app.get("/matches/:userId", async (req, res) => {
     const cities = await City.findAll();
     const traits = await Trait.findAll();
 
-    // Step 3: Extract profiles of matched people
     const matchedProfiles = matches.map((match) => {
-      // Determine the matched profile (opposite of the user's profile)
       const matchedProfile = profileIds.includes(match.mentorId)
         ? match.Traveller
         : match.Mentor;
@@ -362,7 +328,6 @@ app.get("/matches/:userId", async (req, res) => {
       };
     });
 
-    // Step 4: Send the matched profiles with pictures in the response
     res.json(profileResponse);
   } catch (error) {
     console.error(error);
@@ -392,7 +357,6 @@ app.post("/review", async (req, res) => {
   const { authorId, receiverId, message, role, rating } = req.body;
 
   try {
-    // Create a new review
     const review = await Review.create({
       authorId,
       receiverId,
@@ -427,17 +391,15 @@ app.post("/register", async (req, res) => {
   const { email, password, name, contact } = req.body;
 
   try {
-    // Check if the email already exists in the database
     const existingUser = await User.findOne({ where: { email } });
 
     if (existingUser) {
       return res.status(400).json({ message: "Email already in use." });
     }
 
-    // Create a new user
     const newUser = await User.create({
       email,
-      password, // In a real app, hash the password before saving
+      password,
       name,
       contact,
     });
@@ -470,9 +432,3 @@ app.post("/login", async (req, res) => {
 
   res.status(200).send(user.id);
 });
-
-// const PORT = 3000;
-// app.listen(PORT, async () => {
-//   await initDatabase();
-//   console.log(`✅ Server running: http://localhost:${PORT}`);
-// });

@@ -37,11 +37,10 @@ export const HomeMatches = () => {
                         date={matches[0].date}
                     />
 
-                    <Button size="sm"  color = "secondary" onClick={() => navigate("/matches")} className="flex flex-row w-full items-center gap-1 text-gray-500">
-                       <div className="flex flex-row items-center gap-1">
-
-                        View All Matches <ArrowRight />
-                       </div>
+                    <Button size="sm" color="secondary" onClick={() => navigate("/matches")} className="flex w-full flex-row items-center gap-1 text-gray-500">
+                        <div className="flex flex-row items-center gap-1">
+                            View All Matches <ArrowRight />
+                        </div>
                     </Button>
                 </>
             )}

@@ -1,4 +1,3 @@
-// ...existing code...
 import { faker } from "@faker-js/faker";
 import {
   User,
@@ -14,21 +13,17 @@ import {
 export default async function seedDatabase() {
   console.log("🌱 Seeding mock data...");
 
-  // Cities
   const cities = await City.bulkCreate(
     Array.from({ length: 10 }).map((_, i) => ({ name: `City ${i + 1}` }))
   );
 
-  // Countries
   const countries = await Country.bulkCreate(
     Array.from({ length: 10 }).map((_, i) => ({ name: `Country ${i + 1}` }))
   );
 
-  // Traits (names)
   const traitNames = ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"];
   await Trait.bulkCreate(traitNames.map((t) => ({ name: t })));
 
-  // Users + Pictures
   const users = [];
   for (let i = 0; i < 10; i++) {
     const user = await User.create({
@@ -54,7 +49,6 @@ export default async function seedDatabase() {
     users.push(user);
   }
 
-  // Profiles store trait names directly
   const profiles = [];
   for (const user of users) {
     const randomCity = faker.helpers.arrayElement(cities);
@@ -74,7 +68,6 @@ export default async function seedDatabase() {
     profiles.push(profile);
   }
 
-  // Matches (between profiles)
   for (let i = 0; i < 8; i++) {
     const a = faker.helpers.arrayElement(profiles);
     let b = faker.helpers.arrayElement(profiles);
@@ -88,7 +81,6 @@ export default async function seedDatabase() {
     });
   }
 
-  // Reviews (receiver is Profile)
   for (let i = 0; i < 20; i++) {
     const receiver = faker.helpers.arrayElement(profiles);
     let author = faker.helpers.arrayElement(profiles);
@@ -103,7 +95,4 @@ export default async function seedDatabase() {
       rating: faker.number.int({ min: 1, max: 5 }),
     });
   }
-
-  console.log("✅ Mock data seeded!");
 }
-// ...existing code...

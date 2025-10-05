@@ -4,7 +4,6 @@ import { Profile, User, Picture, Review, Match } from "../models/index.js";
 
 const router = express.Router();
 
-// List profiles
 router.get("/profiles", async (_req, res) => {
   const profiles = await Profile.findAll({
     include: [{ model: User, include: [Picture] }],
@@ -32,7 +31,6 @@ router.get("/profiles", async (_req, res) => {
   res.status(200).json(profileResponse);
 });
 
-// Check by userId + cityId
 router.get("/profiles/check", async (req, res) => {
   const userId = Number(req.query.userId);
   const city = Number(req.query.city);
@@ -45,7 +43,6 @@ router.get("/profiles/check", async (req, res) => {
   res.json(profile.id);
 });
 
-// Search opposite role in same city, return enriched profiles
 router.get("/profiles/search", async (req, res) => {
   try {
     const { city, role, profileId } = req.query;
@@ -55,7 +52,6 @@ router.get("/profiles/search", async (req, res) => {
 
     let profiles = null;
 
-    //mentos look:
     if (role == "mentor") {
       const matches = await Match.findAll({
         where: { mentorId: profileId, receivedPositive: false },
@@ -116,15 +112,14 @@ router.get("/profiles/search", async (req, res) => {
   }
 });
 
-// Create profile
 router.post("/profiles", async (req, res) => {
-  const { userId, city, role, traits, description, date } = req.body; // traits are names now
+  const { userId, city, role, traits, description, date } = req.body;
   try {
     const profile = await Profile.create({
       userId,
       city,
       role,
-      traits, // store names directly
+      traits,
       description,
       date,
     });

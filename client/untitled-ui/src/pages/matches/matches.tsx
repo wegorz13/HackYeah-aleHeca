@@ -7,10 +7,9 @@ import { Button } from "@/components/base/buttons/button";
 import { useUser } from "@/providers/id-provider";
 import { Match } from "./match";
 
-// Shape returned by the server /matches/:userId route
 type ApiMatch = {
     name: string;
-    role: string; // "mentor" | "traveller"
+    role: string;
     description?: string;
     userId: number;
     city?: string;
@@ -22,7 +21,6 @@ type ApiMatch = {
     date?: string;
 };
 
-// Dedupe helper to avoid repeated items when data is refetched
 const uniqueByUserId = (arr: ApiMatch[]) => {
     const seen = new Set<number>();
     return arr.filter((m) => {
@@ -48,7 +46,6 @@ export const Matches = () => {
         fetch(`http://localhost:3000/matches/${userId}`)
             .then((res) => res.json())
             .then((data: ApiMatch[]) => {
-                // Replace, don't append; also dedupe just in case API returns duplicates
                 setMatches(uniqueByUserId(data));
             })
             .catch((err) => console.error(err));
@@ -67,16 +64,12 @@ export const Matches = () => {
                 else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
                 const ids = list.map((d: any) => (typeof d === "number" ? d : d?.id)).filter((id: any) => typeof id === "number");
                 if (ids.length > 0 && active) setAvatarSrc(`http://localhost:3000/picture/${ids[0]}`);
-            } catch (_) {
-                /* silent */
-            }
+            } catch (_) {}
         })();
         return () => {
             active = false;
         };
     }, []);
-
-    // Map tabs to roles returned by API
 
     const tabItems = useMemo(
         () => [
@@ -105,7 +98,6 @@ export const Matches = () => {
             </div>
 
             <div className="mx-auto flex w-full max-w-89 flex-col items-center p-4">
-                {/* Connected horizontal tabs centered */}
                 <div className="mb-4 flex w-full justify-center">
                     <Tabs selectedKey={selectedTab} onSelectionChange={(key) => setSelectedTab(key as "traveling" | "guiding")} className="w-auto">
                         <Tabs.List type="button-border" size="sm" aria-label="Match type" items={tabItems} />

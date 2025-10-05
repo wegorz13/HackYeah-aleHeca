@@ -1,27 +1,27 @@
 import { useEffect, useState } from "react";
 import { ArrowRight } from "@untitledui/icons";
+import { useNavigate } from "react-router";
 import { Badge } from "@/components/base/badges/badges";
 import { Button } from "@/components/base/buttons/button";
 import { useUser } from "@/providers/id-provider";
-import { useNavigate } from "react-router";
-
 
 export const YourGuides = () => {
     const { userId } = useUser();
-  
 
     const [profiles, setProfiles] = useState([]);
     const navigate = useNavigate();
-    const navigateExplorer = () => navigate("/explorer", { state: { city: profiles[0].city, role:"mentor", profileId: profiles[0].id } });
+    const navigateExplorer = () => navigate("/explorer", { state: { city: profiles[0].city, role: "mentor", profileId: profiles[0].id } });
 
     useEffect(() => {
         fetch(`http://localhost:3000/profiles/${userId}`)
             .then((res) => res.json())
-            .then((data) => setProfiles(data.filter(profile => profile.role === "mentor")))
+            .then((data) => setProfiles(data.filter((profile) => profile.role === "mentor")))
             .catch((err) => console.error(err));
     }, [userId]);
 
-    const onClick = () => {navigateExplorer()};
+    const onClick = () => {
+        navigateExplorer();
+    };
 
     console.log(profiles);
     return (

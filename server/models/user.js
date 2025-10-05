@@ -1,4 +1,3 @@
-// ...existing code...
 export default (sequelize, DataTypes) => {
   const User = sequelize.define("User", {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -8,8 +7,6 @@ export default (sequelize, DataTypes) => {
     age: { type: DataTypes.INTEGER, allowNull: true },
     contact: { type: DataTypes.JSON, allowNull: true },
     country: { type: DataTypes.STRING, allowNull: true },
-    
   });
   return User;
 };
-// ...existing code...

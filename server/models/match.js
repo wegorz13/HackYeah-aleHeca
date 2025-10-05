@@ -1,4 +1,3 @@
-// ...existing code...
 export default (sequelize, DataTypes) => {
   const Match = sequelize.define("Match", {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -9,4 +8,3 @@ export default (sequelize, DataTypes) => {
   });
   return Match;
 };
-// ...existing code...

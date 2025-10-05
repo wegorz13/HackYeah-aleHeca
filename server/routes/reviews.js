@@ -1,4 +1,3 @@
-// ...existing code...
 import express from "express";
 import { Review } from "../models/index.js";
 
@@ -25,4 +24,3 @@ router.post("/review", async (req, res) => {
 });
 
 export default router;
-// ...existing code...

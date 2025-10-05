@@ -1,4 +1,3 @@
-// ...existing code...
 import express from "express";
 import { City } from "../models/index.js";
 import { Trait } from "../models/index.js";
@@ -22,4 +21,3 @@ router.get("/traits", async (req, res) => {
 });
 
 export default router;
-// ...existing code...

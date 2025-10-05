@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { ArrowLeft } from "@untitledui/icons";
 import { useParams } from "react-router";
+import { useNavigate } from "react-router";
 import { Badge } from "@/components/base/badges/badges";
 import { Button } from "@/components/base/buttons/button";
 import { ProgressBar } from "@/components/base/progress-indicators/progress-indicators";
 import { FirstStep } from "./first-step";
 import { SecondStep } from "./second-step";
 import { ThirdStep } from "./third-step";
-import { useNavigate } from "react-router";
 
 export const CreateProfile = () => {
     const { city } = useParams();
@@ -25,7 +25,7 @@ export const CreateProfile = () => {
     const [profileId, setProfileId] = useState(0);
 
     const navigate = useNavigate();
-    const navigateExplorer = () => navigate("/explorer", { state: { city, role:"traveller", profileId } });
+    const navigateExplorer = () => navigate("/explorer", { state: { city, role: "traveller", profileId } });
 
     function saveData() {
         const profileData = {
@@ -45,22 +45,22 @@ export const CreateProfile = () => {
             body: JSON.stringify(profileData),
         })
             .then((res) => res.json())
-            .then((data) => { setProfileId(data.id); console.log(data.id) ; navigateExplorer(); })
-                
-            };
-
-    
+            .then((data) => {
+                setProfileId(data.id);
+                console.log(data.id);
+                navigateExplorer();
+            });
+    }
 
     const goNext = () => {
-    if (third) {
-        saveData();
-    }
-    else if (second) {
-      setThird(true);
-    } else  {
-      setSecond(true);
-    }
-  };
+        if (third) {
+            saveData();
+        } else if (second) {
+            setThird(true);
+        } else {
+            setSecond(true);
+        }
+    };
 
     const goPrevious = () => {
         if (second === false) {
@@ -82,12 +82,12 @@ export const CreateProfile = () => {
             </Badge>
             <div className="text-2xl font-bold">What are your plans for {city}?</div>
             <div className="flex w-full flex-row items-center gap-2">
-                <ProgressBar className="bg-gray-200 [&>div]:bg-orange-500" min={0} max={100} value={ 100 } />
+                <ProgressBar className="bg-gray-200 [&>div]:bg-orange-500" min={0} max={100} value={100} />
                 <ProgressBar className="bg-gray-200 [&>div]:bg-orange-500" min={0} max={100} value={second ? 100 : 0} />
                 <ProgressBar className="bg-gray-200 [&>div]:bg-orange-500" min={0} max={100} value={third ? 100 : 0} />
             </div>
             {second === false && <FirstStep arriving={arriving} setArriving={setArriving} leaving={leaving} setLeaving={setLeaving} />}
-            {second === true && third === false && <SecondStep chosenTraits={chosenTraits} setChosenTraits={setChosenTraits}/>}
+            {second === true && third === false && <SecondStep chosenTraits={chosenTraits} setChosenTraits={setChosenTraits} />}
             {second === true && third === true && <ThirdStep additionalInfo={additionalInfo} setAdditionalInfo={setAditionalInfo} />}
             <div className="absolute right-0 bottom-0 left-0 my-5 flex w-full items-center gap-4 p-4">
                 <Button
@@ -102,7 +102,6 @@ export const CreateProfile = () => {
                     Next
                 </Button>
             </div>
-            </div>
-     
+        </div>
     );
 };

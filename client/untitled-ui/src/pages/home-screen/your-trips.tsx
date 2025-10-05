@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { ArrowRight } from "@untitledui/icons";
+import { useNavigate } from "react-router";
 import { Badge } from "@/components/base/badges/badges";
 import { Button } from "@/components/base/buttons/button";
 import { useUser } from "@/providers/id-provider";
-import { useNavigate } from "react-router";
 
 export const YourTrips = () => {
     const { userId } = useUser();
@@ -14,11 +14,13 @@ export const YourTrips = () => {
     useEffect(() => {
         fetch(`http://localhost:3000/profiles/${userId}`)
             .then((res) => res.json())
-            .then((data) => setProfiles(data.filter(profile => profile.role === "traveller")))
+            .then((data) => setProfiles(data.filter((profile) => profile.role === "traveller")))
             .catch((err) => console.error(err));
     }, [userId]);
 
-    const onClick = () => {navigate("/trips")};
+    const onClick = () => {
+        navigate("/trips");
+    };
 
     console.log(profiles[0]);
     return (

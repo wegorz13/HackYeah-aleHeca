@@ -15,17 +15,15 @@ import path from "path";
 export default async function seedDatabase() {
   console.log("🌱 Seeding mock data...");
 
-  // Helper to build a unique list from a generator
   const unique = (genFn, count) => {
     const set = new Set();
     while (set.size < count) {
       set.add(genFn());
-      if (set.size > count * 2) break; // safety
+      if (set.size > count * 2) break;
     }
     return Array.from(set).slice(0, count);
   };
 
-  // Cities (more realistic English city names)
   const cityNames = [
     "Tokyo",
     "Paris",
@@ -40,13 +38,11 @@ export default async function seedDatabase() {
   ];
   const cities = await City.bulkCreate(cityNames.map((name) => ({ name })));
 
-  // Countries (real English country names)
   const countryNames = unique(() => faker.location.country(), 20);
   const countries = await Country.bulkCreate(
     countryNames.map((name) => ({ name }))
   );
 
-  // Expanded trait list (English, lifestyle / travel oriented)
   const traitNames = [
     "Hiking",
     "Photo",
@@ -80,7 +76,6 @@ export default async function seedDatabase() {
   ];
   await Trait.bulkCreate(traitNames.map((t) => ({ name: t })));
 
-  // Users (more users, richer contact info)
   const users = [];
   for (let i = 0; i < 10; i++) {
     const first = faker.person.firstName();
@@ -105,8 +100,6 @@ export default async function seedDatabase() {
     users.push(user);
   }
 
-  // Seed picture blobs from seed-assets/pictures for files named <userId>_<index>.png
-  // e.g. 1_1.png, 1_2.png ... 2_1.png etc.
   try {
     const picsDir = path.join(
       process.cwd(),
@@ -124,42 +117,25 @@ export default async function seedDatabase() {
         const m = f.match(fileRegex);
         if (!m) continue;
         const userId = parseInt(m[1], 10);
-        const order = parseInt(m[2], 10); // use the second number as order
+        const order = parseInt(m[2], 10);
         if (!Number.isInteger(userId)) continue;
-        if (!users.find((u) => u.id === userId)) continue; // skip if user not created
+        if (!users.find((u) => u.id === userId)) continue;
         const fullPath = path.join(picsDir, f);
         try {
           const buffer = fs.readFileSync(fullPath);
           pictureRows.push({ userId, value: buffer, order });
           perUser.set(userId, (perUser.get(userId) || 0) + 1);
-        } catch (e) {
-          console.warn("⚠️ Failed reading image", fullPath, e.message);
-        }
+        } catch (e) {}
       }
       if (pictureRows.length) {
         await Picture.bulkCreate(pictureRows);
-        console.log(`🖼️ Seeded ${pictureRows.length} pictures from ${picsDir}`);
-        // Detailed per-user summary (helps verify 3_1 .. 10_1 etc.)
-        console.log("🖼️ Picture distribution:");
-        Array.from(perUser.entries())
-          .sort((a, b) => a[0] - b[0])
-          .forEach(([uId, count]) =>
-            console.log(`  User ${uId}: ${count} image(s)`)
-          );
-      } else {
-        console.log("ℹ️ No picture files matched pattern in", picsDir);
+        Array.from(perUser.entries()).sort((a, b) => a[0] - b[0]);
       }
-    } else {
-      console.log(
-        "ℹ️ Pictures directory not found, skipping picture seeding:",
-        picsDir
-      );
     }
   } catch (e) {
     console.warn("⚠️ Error while seeding pictures:", e.message);
   }
 
-  // Profiles (multiple per user) with richer English descriptions
   const profiles = [];
   for (const user of users) {
     const profileCount = faker.number.int({ min: 1, max: 3 });
@@ -195,7 +171,6 @@ export default async function seedDatabase() {
     }
   }
 
-  // Matches (more volume)
   for (let i = 0; i < 40; i++) {
     const a = faker.helpers.arrayElement(profiles);
     let b = faker.helpers.arrayElement(profiles);
@@ -216,7 +191,6 @@ export default async function seedDatabase() {
     });
   }
 
-  // Reviews (richer English phrasing)
   const reviewPhrasesStart = [
     "Great experience",
     "Very welcoming",
@@ -246,7 +220,6 @@ export default async function seedDatabase() {
     const receiverProfile = faker.helpers.arrayElement(profiles);
     let authorProfile = faker.helpers.arrayElement(profiles);
     let guard = 0;
-    // Ensure different profile and different underlying user
     while (
       (authorProfile.id === receiverProfile.id ||
         authorProfile.userId === receiverProfile.userId) &&
@@ -259,13 +232,11 @@ export default async function seedDatabase() {
       reviewPhrasesStart
     )} – ${faker.helpers.arrayElement(reviewPhrasesEnd)}`;
     await Review.create({
-      authorId: authorProfile.userId, // FIX: must reference Users table
-      receiverId: receiverProfile.userId, // FIX: must reference Users table
+      authorId: authorProfile.userId,
+      receiverId: receiverProfile.userId,
       message,
       role: faker.helpers.arrayElement(["mentor", "traveller"]),
       rating: faker.number.int({ min: 1, max: 5 }),
     });
   }
-
-  console.log("✅ Mock data seeded!");
 }

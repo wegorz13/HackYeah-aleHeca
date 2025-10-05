@@ -23,12 +23,10 @@ export default function Chat() {
 
     const location = useLocation() as { state?: { receiverName?: string; receiverAvatar?: string } };
 
-    // Replace static receiverName with stateful value
     const [receiverName, setReceiverName] = useState<string>(location.state?.receiverName || (otherId ? `User ${otherId}` : "Chat"));
     const receiverAvatar = location.state?.receiverAvatar;
     const [fetchedAvatar, setFetchedAvatar] = useState<string | null>(null); // new
 
-    // Fetch receiver name from backend if otherId present (override placeholder/UI state)
     useEffect(() => {
         if (!otherId) return;
         let active = true;
@@ -40,16 +38,13 @@ export default function Chat() {
                 if (active && data?.name && typeof data.name === "string") {
                     setReceiverName(data.name);
                 }
-            } catch {
-                /* silent */
-            }
+            } catch {}
         })();
         return () => {
             active = false;
         };
     }, [otherId]);
 
-    // Fetch receiver first photo if not passed
     useEffect(() => {
         if (receiverAvatar || !otherId) return;
         let active = true;
@@ -64,9 +59,7 @@ export default function Chat() {
                 else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
                 const ids = list.map((d: any) => (typeof d === "number" ? d : d?.id)).filter((id: any) => typeof id === "number");
                 if (active && ids.length > 0) setFetchedAvatar(`http://localhost:3000/picture/${ids[0]}`);
-            } catch {
-                /* silent */
-            }
+            } catch {}
         })();
         return () => {
             active = false;
@@ -94,7 +87,6 @@ export default function Chat() {
     useEffect(() => {}, [otherId]);
 
     useEffect(() => {
-        // auto scroll to bottom on new messages
         const el = listRef.current;
         if (el) {
             el.scrollTop = el.scrollHeight;
@@ -110,7 +102,6 @@ export default function Chat() {
     };
 
     const groups = useMemo(() => {
-        // group by day to render separators like "Today"
         const out: { label: string; items: ChatMsg[] }[] = [];
         const todayStr = new Date().toDateString();
         for (const m of chat) {
@@ -128,7 +119,6 @@ export default function Chat() {
 
     return (
         <div className="flex h-[100dvh] max-w-100 flex-col bg-white">
-            {/* Header */}
             <div className="sticky top-0 z-10 border-b bg-white/90 p-4 backdrop-blur">
                 <div className="relative mx-auto flex max-w-[640px] items-center justify-center">
                     <button onClick={() => navigate(-1)} className="absolute left-0 flex h-9 w-9 items-center justify-center rounded-full hover:bg-gray-100">
@@ -138,11 +128,9 @@ export default function Chat() {
                 </div>
             </div>
 
-            {/* Messages */}
             <div ref={listRef} className="mx-auto flex w-full max-w-[640px] flex-1 flex-col gap-4 overflow-y-auto p-4">
                 {groups.map((g, gi) => (
                     <div key={gi}>
-                        {/* Day separator */}
                         <div className="my-2 flex items-center gap-3">
                             <div className="h-px flex-1 bg-gray-200" />
                             <div className="text-xs font-medium text-gray-400">{g.label}</div>
@@ -193,7 +181,6 @@ export default function Chat() {
                 ))}
             </div>
 
-            {/* Composer */}
             <div className="border-t bg-white p-3">
                 <form
                     onSubmit={(e) => {

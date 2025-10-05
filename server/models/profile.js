@@ -1,4 +1,3 @@
-// ...existing code...
 export default (sequelize, DataTypes) => {
   const Profile = sequelize.define("Profile", {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -8,10 +7,9 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.ENUM("mentor", "traveller", "admin"),
       allowNull: false,
     },
-    traits: { type: DataTypes.JSON, allowNull: true }, // array of trait names
+    traits: { type: DataTypes.JSON, allowNull: true },
     description: { type: DataTypes.TEXT, allowNull: true },
     date: { type: DataTypes.TEXT, allowNull: true },
   });
   return Profile;
 };
-// ...existing code...

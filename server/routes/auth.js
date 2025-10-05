@@ -1,4 +1,3 @@
-// ...existing code...
 import express from "express";
 import { User } from "../models/index.js";
 
@@ -46,4 +45,3 @@ router.post("/login", async (req, res) => {
 });
 
 export default router;
-// ...existing code...

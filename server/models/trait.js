@@ -1,4 +1,3 @@
-// ...existing code...
 export default (sequelize, DataTypes) => {
   const Trait = sequelize.define("Trait", {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -6,4 +5,3 @@ export default (sequelize, DataTypes) => {
   });
   return Trait;
 };
-// ...existing code...

@@ -4,8 +4,8 @@ import { useNavigate } from "react-router";
 import AutosuggestInput from "./autosuggestInput";
 import { HomeMatches } from "./home-matches";
 import { HomeScreenHeader } from "./homse-screen-header";
-import { YourTrips } from "./your-trips";
 import { YourGuides } from "./your-guides";
+import { YourTrips } from "./your-trips";
 
 export const HomeScreen = () => {
     const [cities, setCities] = useState([]);
@@ -26,7 +26,7 @@ export const HomeScreen = () => {
     console.log(cityName);
 
     return (
-        <div className="flex max-w-89 items-center justify-center p-4 ">
+        <div className="flex max-w-89 items-center justify-center p-4">
             <div className="justify center flex max-w-200 flex-col gap-1">
                 <HomeScreenHeader />
 

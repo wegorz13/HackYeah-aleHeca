@@ -14,7 +14,6 @@ app.use(express.json());
 app.use(cors());
 
 app.use(cors());
-// Register all routes at root (keeps original endpoints like /users, /profiles, etc.)
 app.use(routes);
 const server = http.createServer(app);
 
@@ -25,18 +24,16 @@ const io = new Server(server, {
   },
 });
 
-const onlineUsers = {}; // { userId: socketId }
+const onlineUsers = {};
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  // When a user logs in from frontend:
   socket.on("register", (userId) => {
     onlineUsers[userId] = socket.id;
     console.log(`User ${userId} registered`);
   });
 
-  // When a message is sent
   socket.on("private_message", ({ senderId, receiverId, content }) => {
     const receiverSocket = onlineUsers[receiverId];
     if (receiverSocket) {
@@ -44,7 +41,6 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Cleanup on disconnect
   socket.on("disconnect", () => {
     for (const [userId, id] of Object.entries(onlineUsers)) {
       if (id === socket.id) {

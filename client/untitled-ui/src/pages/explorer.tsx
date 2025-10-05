@@ -19,7 +19,7 @@ export const Explorer = () => {
 
     const onClick = () => {
         navigate("/profile");
-    }
+    };
 
     const { state } = useLocation() as { state?: { city: string; role: string; profileId: number } };
 
@@ -43,7 +43,6 @@ export const Explorer = () => {
             .finally(() => setLoading(false));
     }, []);
 
-    // Fetch avatar picture (first image id) like HomeScreenHeader
     useEffect(() => {
         if (userId == null) return;
         let active = true;
@@ -58,9 +57,7 @@ export const Explorer = () => {
                 else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
                 const ids = list.map((d: any) => (typeof d === "number" ? d : d?.id)).filter((id: any) => typeof id === "number");
                 if (ids.length > 0 && active) setAvatarSrc(`http://localhost:3000/picture/${ids[0]}`);
-            } catch (_) {
-                /* silent */
-            }
+            } catch (_) {}
         })();
         return () => {
             active = false;
@@ -100,10 +97,10 @@ export const Explorer = () => {
     }
 
     return (
-        <div className="max-w-89 rows items-center justify-center gap-2">
+        <div className="rows max-w-89 items-center justify-center gap-2">
             <div className="shadow-gray-1000/1000 m-2 m-7 rounded-3xl bg-white shadow-md">
                 <div className="flex w-full items-center justify-center p-1">
-                    <button onClick={() => (window.history.back())} className="rounded-full p-2 hover:bg-gray-100">
+                    <button onClick={() => window.history.back()} className="rounded-full p-2 hover:bg-gray-100">
                         <ArrowLeft className="h-5 w-5" />
                     </button>
                     <div className="flex flex-1 justify-center">
@@ -112,14 +109,15 @@ export const Explorer = () => {
                             {state.city}
                         </span>
                     </div>
-                <Button color="link-gray" noTextPadding={true} onClick={onClick}>
-                    {avatarSrc ? <Avatar size="md" alt="User" src={avatarSrc} /> : <User01 />}
-                </Button>                </div>
+                    <Button color="link-gray" noTextPadding={true} onClick={onClick}>
+                        {avatarSrc ? <Avatar size="md" alt="User" src={avatarSrc} /> : <User01 />}
+                    </Button>{" "}
+                </div>
             </div>
             <div className="row flex items-center justify-center">
                 <UserCard profil={profiles[0]}></UserCard>
             </div>
-            <div className="max-w-89 absolute right-0 bottom-0 left-0 my-5 flex w-full items-center gap-4 p-4">
+            <div className="absolute right-0 bottom-0 left-0 my-5 flex w-full max-w-89 items-center gap-4 p-4">
                 <Button
                     className="border-color-grey-500 text-color-black w-9/20 bg-white"
                     onClick={() => {

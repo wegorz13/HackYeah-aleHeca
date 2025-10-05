@@ -1,4 +1,3 @@
-// ...existing code...
 import express from "express";
 import multer from "multer";
 import { Picture } from "../models/index.js";
@@ -7,7 +6,6 @@ const router = express.Router();
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-// POST /api/picture
 router.post("/picture", upload.single("image"), async (req, res) => {
   try {
     const { userId, order } = req.body;
@@ -16,10 +14,12 @@ router.post("/picture", upload.single("image"), async (req, res) => {
     const picture = await Picture.create({
       userId: userId,
       value: req.file.buffer,
-      order: order ?? 0
+      order: order ?? 0,
     });
 
-    res.status(200).json({ message: "Picture saved!", pictureId: picture.id , order:order});
+    res
+      .status(200)
+      .json({ message: "Picture saved!", pictureId: picture.id, order: order });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to save picture" });
@@ -40,7 +40,4 @@ router.get("/picture/:id", async (req, res) => {
   }
 });
 
-
-
 export default router;
-// ...existing code...
