@@ -82,13 +82,13 @@ export const Explorer = () => {
     };
 
     function like(profileId: number) {
-        fetch("/like", {
+        fetch("http://localhost:3000/like", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 likerRole: state?.role,
                 likerId: state?.profileId,
-                profileId,
+                profileId: profileId,
             }),
         });
     }
