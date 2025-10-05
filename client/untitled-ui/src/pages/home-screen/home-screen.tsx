@@ -28,9 +28,7 @@ export const HomeScreen = () => {
     return (
         <div className="flex max-w-89 items-center justify-center p-4">
             <div className="justify center flex max-w-200 flex-col gap-10">
-                
                 <HomeScreenHeader />
-              
 
                 <div className="text-center text-xl font-bold">
                     Where do you want to become <span className="text-orange-500">local?</span>
@@ -46,11 +44,10 @@ export const HomeScreen = () => {
                             return cityName.filter((x) => x.toLowerCase().includes(q.toLowerCase())).map((label, i) => ({ id: i, label }));
                         }}
                     />
-     
                 </div>
 
                 <YourTrips />
-       
+
                 <HomeMatches />
             </div>
         </div>

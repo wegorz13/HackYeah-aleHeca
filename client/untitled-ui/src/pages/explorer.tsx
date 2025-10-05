@@ -5,12 +5,13 @@ import { LoadingIndicator } from "@/components/application/loading-indicator/loa
 import { Avatar } from "@/components/base/avatar/avatar";
 import { Button } from "@/components/base/buttons/button";
 import { UserCard } from "@/components/user_card.tsx";
+import { useUser } from "@/providers/id-provider";
 
 export const Explorer = (prompts: any) => {
     const [profiles, setProfiles] = useState([]);
     const [index, setIndex] = useState(0);
     const [avatarSrc, setAvatarSrc] = useState<string | null>(null); // added
-    const USER_ID = 2; // hardcoded (adjust if needed)
+    const { userId } = useUser();
     const [message, setMessage] = useState("");
 
     const { state } = useLocation() as { state?: { city: string; role: string; profileId: number } };
@@ -39,7 +40,7 @@ export const Explorer = (prompts: any) => {
         let active = true;
         (async () => {
             try {
-                const res = await fetch(`http://localhost:3000/user/${USER_ID}/pictures`);
+                const res = await fetch(`http://localhost:3000/user/${userId}/pictures`);
                 if (!res.ok) return;
                 const json = await res.json();
                 let list: any[] = [];
