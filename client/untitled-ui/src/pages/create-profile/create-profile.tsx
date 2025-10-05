@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { ArrowLeft } from "@untitledui/icons";
-import { Input } from "react-aria-components";
 import { useParams } from "react-router";
 import { Badge } from "@/components/base/badges/badges";
 import { Button } from "@/components/base/buttons/button";
@@ -15,7 +14,6 @@ export const CreateProfile = () => {
     const onClick = () => {
         window.history.back();
     };
-    const [first, setFirst] = useState(true);
     const [second, setSecond] = useState(false);
     const [third, setThird] = useState(false);
   
@@ -54,7 +52,7 @@ export const CreateProfile = () => {
     }
     else if (second) {
       setThird(true);
-    } else if (first) {
+    } else  {
       setSecond(true);
     }
   };
@@ -78,7 +76,7 @@ export const CreateProfile = () => {
             </Badge>
             <div className="text-2xl font-bold">What are your plans for {city}?</div>
             <div className="flex w-full flex-row items-center gap-2">
-                <ProgressBar className="bg-gray-200 [&>div]:bg-orange-500" min={0} max={100} value={first ? 100 : 0} />
+                <ProgressBar className="bg-gray-200 [&>div]:bg-orange-500" min={0} max={100} value={100} />
                 <ProgressBar className="bg-gray-200 [&>div]:bg-orange-500" min={0} max={100} value={second ? 100 : 0} />
                 <ProgressBar className="bg-gray-200 [&>div]:bg-orange-500" min={0} max={100} value={third ? 100 : 0} />
             </div>

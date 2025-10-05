@@ -1,10 +1,10 @@
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { MarkerPin01 } from "@untitledui/icons";
+import { useNavigate } from "react-router";
 import AutosuggestInput from "./autosuggestInput";
+import { HomeMatches } from "./home-matches";
 import { HomeScreenHeader } from "./homse-screen-header";
 import { Trips } from "./trips";
-import { useNavigate } from "react-router";
-import { HomeMatches } from "./home-matches";
 
 export const HomeScreen = () => {
     const [cities, setCities] = useState([]);
@@ -16,9 +16,11 @@ export const HomeScreen = () => {
             .then((data) => setCities(data))
             .catch((err) => console.error(err));
     }, []);
-    
 
-    const onSelect = (value) => { console.log(value);navigate(`/create-profile/${value.label}`);}; 
+    const onSelect = (value) => {
+        console.log(value);
+        navigate(`/create-profile/${value.label}`);
+    };
 
     const cityName = cities.map((city) => city.name);
     console.log(cityName);
@@ -26,7 +28,10 @@ export const HomeScreen = () => {
     return (
         <div className="flex max-w-89 items-center justify-center p-4">
             <div className="justify center flex max-w-200 flex-col gap-10">
+                
                 <HomeScreenHeader />
+                <div className="bg-gradient-to-b from-orange-400 to-orange-300 text-white p-3 pb-10 shadow-md">
+
                 <div className="text-center text-xl font-bold">
                     Where do you want to become <span className="text-orange-500">local?</span>
                 </div>
@@ -42,9 +47,10 @@ export const HomeScreen = () => {
                         }}
                     />
                 </div>
+                </div>
 
                 <Trips />
-                        <HomeMatches />
+                <HomeMatches />
             </div>
         </div>
     );
