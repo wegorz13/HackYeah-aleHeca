@@ -174,7 +174,7 @@ async function seedDatabase() {
     });
   }
 
-  console.log("✅ Mock data seeded!");
+  // console.log("✅ Mock data seeded!");
 }
 
 // ==========================

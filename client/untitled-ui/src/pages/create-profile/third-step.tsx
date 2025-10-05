@@ -1,18 +1,26 @@
-import {useState} from "react";
+import { TextArea } from "@/components/base/textarea/textarea";
 
-export const ThirdStep = () => {
+type ThirdStepProps = {
+    additionalInfo: string;
+    setAdditionalInfo: (additionalInfo: string) => void;
+};
 
-    const [description, setDescription] = useState("");
-
+export const ThirdStep = ({ additionalInfo, setAdditionalInfo }: ThirdStepProps) => {
     return (
-        <div className="w-full flex flex-col items-start gap-1">
-            <p>Additional info</p>
-            <textarea
-                className="border border-gray-500 rounded p-2 w-full"
-                placeholder="Enter a description..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-            ></textarea></div>
+        <>
+            <div className="flex w-full flex-col gap-4">
+                <h3 className="text-sm font-medium text-gray-900">Additional Info</h3>
+                <div className="flex flex-col gap-1">
+                    <TextArea
+                        value={additionalInfo}
+                        onChange={setAdditionalInfo}
+                        isRequired
+                        placeholder="Enter additional info..."
+                        hint="Max 256 characters"
+                        rows={5}
+                    />
+                </div>
+            </div>
+        </>
     );
-}
- 
+};

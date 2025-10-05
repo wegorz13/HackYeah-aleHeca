@@ -38,6 +38,7 @@ export const ProfileImages: React.FC = () => {
       }
       const data = await res.json();
       setLastUploadId(data.pictureId);
+      console.log(data.pictureId);
       // refresh images
       await reload();
     } catch(err){
@@ -52,12 +53,13 @@ export const ProfileImages: React.FC = () => {
     setError(null);
     try {
       const res = await fetch(`http://localhost:3000/user/${USER_ID}/pictures`);
-      if (!res.ok) throw new Error('Failed fetching picture list');
-      const json = await res.json();
-      let list: any[] = [];
-      if (Array.isArray(json)) list = json; else if (Array.isArray(json.pictureIds)) list = json.pictureIds; else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
-      list = list.slice().sort((a,b)=> (a.order ?? 0) - (b.order ?? 0));
-      setPictureIds(list.map(d=>d.id).filter((id:any)=> typeof id === 'number'));
+      if (res.ok) {
+            const json = await res.json();
+            let list: any[] = [];
+            if (Array.isArray(json)) list = json; else if (Array.isArray(json.pictureIds)) list = json.pictureIds; else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
+            list = list.slice().sort((a,b)=> (a.order ?? 0) - (b.order ?? 0));
+            setPictureIds(list.map(d=>d.id).filter((id:any)=> typeof id === 'number'));
+        }
     } catch(e:any){
       setError(e.message || 'Error');
     } finally {
