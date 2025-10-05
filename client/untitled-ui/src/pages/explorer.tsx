@@ -7,16 +7,10 @@ import { Button } from "@/components/base/buttons/button";
 import { UserCard } from "@/components/user_card.tsx";
 import {useUser} from "@/providers/id-provider.tsx";
 
-// Minimal profile type (must include id)
 type ProfileItem = { id: number } & Record<string, any>;
 
 export const Explorer = () => {
     const [profiles, setProfiles] = useState<ProfileItem[]>([]);
-    const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
-    const USER_ID = 2; // hardcoded (adjust if needed)
-export const Explorer = (prompts: any) => {
-    const [profiles, setProfiles] = useState([]);
-    const [index, setIndex] = useState(0);
     const [avatarSrc, setAvatarSrc] = useState<string | null>(null); // added
     const USER_ID =  useUser();
     const [message, setMessage] = useState("");
@@ -31,6 +25,8 @@ export const Explorer = (prompts: any) => {
         role: state.role,
         profileId: state.profileId.toString(),
     });
+
+    console.log(profiles[0])
 
     useEffect(() => {
         setLoading(true);
