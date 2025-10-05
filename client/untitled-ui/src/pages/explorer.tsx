@@ -104,7 +104,7 @@ export const Explorer = (prompts: any) => {
             <div className="row flex items-center justify-center">
                 <UserCard profil={profiles[index]}></UserCard>
             </div>
-            <div className="absolute right-0 bottom-0 left-0 my-5 flex w-full max-w-89 items-center gap-4 p-4">
+            <div className="absolute right-0 bottom-0 left-0 my-5 flex w-full items-center gap-4 p-4">
                 <Button
                     className="border-color-grey-500 text-color-black w-9/20 bg-white"
                     onClick={() => {
@@ -115,7 +115,7 @@ export const Explorer = (prompts: any) => {
                 >
                     Skip
                 </Button>
-                <Button className="border-color-500 w-9/20 bg-orange-500" onClick={() => next_profil()}>
+                <Button className="border-color-500 w-10/20 bg-orange-500" onClick={() => next_profil()}>
                     Like
                 </Button>
             </div>
