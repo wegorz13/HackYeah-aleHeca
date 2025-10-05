@@ -1,10 +1,14 @@
 import {useEffect, useState} from "react";
 
+type SecondStepProps = {
+    chosenTraits: string[];
+    setChosenTraits: (traits: string[]) => void;
+}
 
-export const SecondStep = () => {
+
+export const SecondStep = ({chosenTraits, setChosenTraits} : SecondStepProps) => {
 
     const [traits, setTraits] = useState([]);
-    const [chosenTraits, setChosenTraits] = useState([]);
 
     function toggleTrait(trait:string){
         if(chosenTraits.length ===0){
