@@ -1,10 +1,20 @@
 
 
-export const SecondStep = () => {
+type SecondStepProps = {
+
+ 
+};
+
+
+export const SecondStep = ({}: SecondStepProps) => {
    
     return (
-        <div className="flex flex-col max-w-89 items-center justify-center p-4 gap-4">
-                </div>
+        <> 
+      <div className="flex w-full flex-col gap-4">
+  <h3 className="text-sm font-medium text-gray-900">What are you looking for</h3>
+      
+      </div>
+    </>
     );
 }
  
