@@ -13,6 +13,6 @@ export const ThirdStep = () => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
             ></textarea></div>
-    );
+    ); 
 }
  
