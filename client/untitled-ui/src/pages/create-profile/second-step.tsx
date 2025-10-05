@@ -6,6 +6,23 @@ type SecondStepProps = {
 }
 
 
+<<<<<<< HEAD
+type SecondStepProps = {
+
+ 
+};
+
+
+export const SecondStep = ({}: SecondStepProps) => {
+   
+    return (
+        <> 
+      <div className="flex w-full flex-col gap-4">
+  <h3 className="text-sm font-medium text-gray-900">What are you looking for</h3>
+      
+      </div>
+    </>
+=======
 export const SecondStep = ({chosenTraits, setChosenTraits} : SecondStepProps) => {
 
     const [traits, setTraits] = useState([]);
@@ -56,6 +73,7 @@ export const SecondStep = ({chosenTraits, setChosenTraits} : SecondStepProps) =>
                 ))}
             </div>
         </div>
+>>>>>>> 45924ac411b6ab1bf79d15a045e9fad219adca33
     );
 }
  

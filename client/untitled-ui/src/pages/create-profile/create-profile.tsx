@@ -15,7 +15,6 @@ export const CreateProfile = () => {
     const onClick = () => {
         window.history.back();
     };
- 
     const [second, setSecond] = useState(false);
     const [third, setThird] = useState(false);
 
@@ -53,14 +52,15 @@ export const CreateProfile = () => {
     
 
     const goNext = () => {
-        if (third) {
-            saveData();
-        } else if (second) {
-            setThird(true);
-        } else  {
-            setSecond(true);
-        }
-    };
+    if (third) {
+        saveData();
+    }
+    else if (second) {
+      setThird(true);
+    } else  {
+      setSecond(true);
+    }
+  };
 
     const goPrevious = () => {
         if (second === false) {
@@ -102,6 +102,7 @@ export const CreateProfile = () => {
                     Next
                 </Button>
             </div>
-        </div>
+            </div>
+     
     );
 };
