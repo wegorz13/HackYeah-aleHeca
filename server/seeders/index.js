@@ -72,7 +72,7 @@ export default async function seedDatabase() {
       role: faker.helpers.arrayElement(["mentor", "traveller"]),
       traits: traitsForProfile, // names
       description: faker.lorem.sentence(),
-      date: faker.helpers.arrayElement(dates),
+      date: "05.10.2025 - 15.10.2025",
     });
 
     profiles.push(profile);

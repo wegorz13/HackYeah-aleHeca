@@ -111,7 +111,7 @@ router.get("/profiles/search", async (req, res) => {
 
 // Create profile
 router.post("/profiles", async (req, res) => {
-  const { userId, city, role, traits, description } = req.body; // traits are names now
+  const { userId, city, role, traits, description, date } = req.body; // traits are names now
   try {
     const profile = await Profile.create({
       userId,
@@ -119,6 +119,7 @@ router.post("/profiles", async (req, res) => {
       role,
       traits, // store names directly
       description,
+      date,
     });
     res.status(201).json(profile);
   } catch (error) {

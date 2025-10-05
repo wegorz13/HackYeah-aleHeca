@@ -2,6 +2,7 @@
 import express from "express";
 import { Op } from "sequelize";
 import { Match, Profile, User, Picture, City } from "../models/index.js";
+import { da } from "@faker-js/faker";
 
 const router = express.Router();
 
@@ -81,6 +82,8 @@ router.get("/matches/:userId", async (req, res) => {
       contact: p.User.contact,
       description: p.description || "",
       country: p.User.country || "",
+      userId: p.userId,
+      date: p.date || "",
     }));
 
     res.json(response);
