@@ -14,7 +14,7 @@ export const YourTrips = () => {
     useEffect(() => {
         fetch(`http://localhost:3000/profiles/${userId}`)
             .then((res) => res.json())
-            .then((data) => setProfiles(data))
+            .then((data) => setProfiles(data.filter(profile => profile.role === "traveller")))
             .catch((err) => console.error(err));
     }, [userId]);
 
