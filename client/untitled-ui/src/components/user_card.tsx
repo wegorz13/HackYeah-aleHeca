@@ -11,7 +11,6 @@ export const UserCard = (prompts: any)=>{
     const traits = prompts.profil.traits;
     const pictures = prompts.profil.pictures[0];
 
-    console.log(pictures)
 
     const url = "https://picsum.photos/300/300";
 
@@ -34,16 +33,16 @@ export const UserCard = (prompts: any)=>{
                 />
             </div>
 
-            <div className="p-4 border-t shadow-md h-60 shadow-gray-1000/20">
+            <div className="p-4 border-t shadow-md shadow-gray-1000/20">
                 <div >
                     <div className="flex justify-between gap-3 my-1">
-                        <div className="flex gap-2 items-center">
+                        <div className="flex gap-2 items-center my-4">
                             <b>{name}</b>
                             <p>{age}</p>
                         </div>
                         <div className="px-2 bg-orange-50 inline-flex gap-2 items-center rounded-lg">
                             <Star01 className="text-orange-500"/>
-                            <b className="text-orange-dark-700">{averageRating}</b>
+                            <b className="text-orange-dark-700">{averageRating.toFixed(2)}</b>
                         </div>
                     </div>
                 </div>
@@ -54,10 +53,10 @@ export const UserCard = (prompts: any)=>{
                 </span>
 
                 <div className="my-2">
-                    <b className="text-sm">{description}</b>
+                    <b className="text-sm my-2">{description}</b>
                 </div>
 
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-2 flex-wrap my-4">
                     {traits.map((trait, index) => (
                         <div
                             key={index}

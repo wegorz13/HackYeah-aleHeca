@@ -9,7 +9,7 @@ const router = express.Router();
 // Like / confirm match
 router.post("/like", async (req, res) => {
   try {
-    const { travellerId, mentorId, role } = req.body; // IDs are Profile IDs
+    const { likerRole, LikerId, profileId } = req.body; // IDs are Profile IDs (liker role, li
     let match;
 
     if (role === "traveller") {
