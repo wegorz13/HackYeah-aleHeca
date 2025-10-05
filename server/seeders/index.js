@@ -107,6 +107,7 @@ export default async function seedDatabase() {
     if (fs.existsSync(picsDir)) {
       const files = fs.readdirSync(picsDir);
       const pictureRows = [];
+      const perUser = new Map();
       const fileRegex = /^(\d+)_([0-9]+)\.(png|jpe?g|webp)$/i;
       for (const f of files) {
         const m = f.match(fileRegex);
@@ -114,11 +115,12 @@ export default async function seedDatabase() {
         const userId = parseInt(m[1], 10);
         const order = parseInt(m[2], 10); // use the second number as order
         if (!Number.isInteger(userId)) continue;
-        if (!users.find((u) => u.id === userId)) continue;
+        if (!users.find((u) => u.id === userId)) continue; // skip if user not created
         const fullPath = path.join(picsDir, f);
         try {
           const buffer = fs.readFileSync(fullPath);
           pictureRows.push({ userId, value: buffer, order });
+          perUser.set(userId, (perUser.get(userId) || 0) + 1);
         } catch (e) {
           console.warn("⚠️ Failed reading image", fullPath, e.message);
         }
@@ -126,6 +128,13 @@ export default async function seedDatabase() {
       if (pictureRows.length) {
         await Picture.bulkCreate(pictureRows);
         console.log(`🖼️ Seeded ${pictureRows.length} pictures from ${picsDir}`);
+        // Detailed per-user summary (helps verify 3_1 .. 10_1 etc.)
+        console.log("🖼️ Picture distribution:");
+        Array.from(perUser.entries())
+          .sort((a, b) => a[0] - b[0])
+          .forEach(([uId, count]) =>
+            console.log(`  User ${uId}: ${count} image(s)`)
+          );
       } else {
         console.log("ℹ️ No picture files matched pattern in", picsDir);
       }
