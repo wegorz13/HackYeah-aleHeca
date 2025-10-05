@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft } from "@untitledui/icons";
+import { ArrowLeft, User01 } from "@untitledui/icons";
+import { useNavigate } from "react-router";
 import { Tabs } from "@/components/application/tabs/tabs";
+import { Avatar } from "@/components/base/avatar/avatar";
 import { Button } from "@/components/base/buttons/button";
 import { useUser } from "@/providers/id-provider";
 import { Match } from "./match";
@@ -33,8 +35,14 @@ const uniqueByUserId = (arr: ApiMatch[]) => {
 
 export const Matches = () => {
     const { userId } = useUser();
+    const [avatarSrc, setAvatarSrc] = useState<string | null>(null); // added
     const [matches, setMatches] = useState<ApiMatch[]>([]);
     const [selectedTab, setSelectedTab] = useState<"traveling" | "guiding">("traveling");
+    const navigate = useNavigate();
+
+    const onClick = () => {
+        navigate("/profile");
+    };
 
     useEffect(() => {
         fetch(`http://localhost:3000/matches/${userId}`)
@@ -46,9 +54,27 @@ export const Matches = () => {
             .catch((err) => console.error(err));
     }, [userId]);
 
-    const onClick = () => {
-        window.history.back();
-    };
+    useEffect(() => {
+        let active = true;
+        (async () => {
+            try {
+                const res = await fetch(`http://localhost:3000/user/${userId}/pictures`);
+                if (!res.ok) return;
+                const json = await res.json();
+                let list: any[] = [];
+                if (Array.isArray(json)) list = json;
+                else if (Array.isArray(json.pictureIds)) list = json.pictureIds;
+                else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
+                const ids = list.map((d: any) => (typeof d === "number" ? d : d?.id)).filter((id: any) => typeof id === "number");
+                if (ids.length > 0 && active) setAvatarSrc(`http://localhost:3000/picture/${ids[0]}`);
+            } catch (_) {
+                /* silent */
+            }
+        })();
+        return () => {
+            active = false;
+        };
+    }, []);
 
     // Map tabs to roles returned by API
 
@@ -65,15 +91,20 @@ export const Matches = () => {
     }, [matches, selectedTab]);
 
     return (
-        <div className="flex max-w-100 flex-col items-center justify-center p-4">
-            <div className="mx-auto flex w-full max-w-100 flex-col items-center p-4">
-                <div className="color-gray-800 mb-2 text-center text-2xl font-bold">
-                    <Button size="sm" color="link-gray" onClick={onClick} className="absolute top-4 left-4 flex">
-                        <ArrowLeft />
+        <div className="flex max-w-89 flex-col items-center justify-center p-4">
+            <div className="relative flex w-full items-center justify-center rounded-3xl px-4 py-3 shadow-[0_8px_12px_-6px_rgba(0,0,0,0.25)]">
+                <div className="flex w-full items-center justify-center p-1">
+                    <button onClick={() => (window.location.href = "/")} className="rounded-full p-2 hover:bg-gray-100">
+                        <ArrowLeft className="h-5 w-5" />
+                    </button>
+                    <div className="flex flex-1 justify-center">Matches</div>
+                    <Button color="link-gray" noTextPadding={true} onClick={onClick}>
+                        {avatarSrc ? <Avatar size="md" alt="User" src={avatarSrc} /> : <User01 />}
                     </Button>
-                    Matches
                 </div>
+            </div>
 
+            <div className="mx-auto flex w-full max-w-89 flex-col items-center p-4">
                 {/* Connected horizontal tabs centered */}
                 <div className="mb-4 flex w-full justify-center">
                     <Tabs selectedKey={selectedTab} onSelectionChange={(key) => setSelectedTab(key as "traveling" | "guiding")} className="w-auto">

@@ -13,6 +13,7 @@ import { RouteProvider } from "@/providers/router-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import "@/styles/globals.css";
 
+
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <ThemeProvider>

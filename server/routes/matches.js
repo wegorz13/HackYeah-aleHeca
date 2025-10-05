@@ -8,10 +8,17 @@ const router = express.Router();
 
 // Like / confirm match
 router.post("/like", async (req, res) => {
+  const { likerRole, likerId, profileId } = req.body; // IDs are Profile IDs
+  console.log(
+    "===========================================",
+    likerId,
+    likerRole,
+    profileId
+  );
+
   try {
     const { likerRole, likerId, profileId } = req.body; // IDs are Profile IDs
     let match;
-
     if (likerRole === "traveller") {
       const expirationDate = new Date();
       expirationDate.setDate(expirationDate.getDate() + 30);
@@ -55,6 +62,7 @@ router.get("/matches/:userId", async (req, res) => {
           { mentorId: { [Op.in]: profileIds } },
           { travellerId: { [Op.in]: profileIds } },
         ],
+        receivedPositive: true,
       },
       include: [
         {
