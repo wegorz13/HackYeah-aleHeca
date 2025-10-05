@@ -33,10 +33,10 @@ export const YourTrips = () => {
                     <div className="flex w-full flex-row items-center justify-between p-2">
                         <div className="flex flex-row items-center gap-2">
                             <Badge>{profiles[0].city}</Badge>
-                            <p className="text-sm text-gray-500">{profiles[0].date}</p>
                         </div>
+                            <p className="text-sm text-gray-500">{profiles[0].date}</p>
                         <div className="flex flex-row items-center gap-2">
-                            <Badge className="text-orange-500">{profiles.length - 1} more trips!</Badge>
+                            <Badge className="text-orange-500">{profiles.length} trip total!</Badge>
                             <Button size="sm" color="link-gray" onClick={onClick} className="text-gray-500">
                                 <ArrowRight />
                             </Button>
