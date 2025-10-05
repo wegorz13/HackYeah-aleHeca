@@ -20,6 +20,17 @@ type ApiMatch = {
     date?: string;
 };
 
+// Dedupe helper to avoid repeated items when data is refetched
+const uniqueByUserId = (arr: ApiMatch[]) => {
+    const seen = new Set<number>();
+    return arr.filter((m) => {
+        const id = Number(m.userId);
+        if (seen.has(id)) return false;
+        seen.add(id);
+        return true;
+    });
+};
+
 export const Matches = () => {
     const { userId } = useUser();
     const [matches, setMatches] = useState<ApiMatch[]>([]);
@@ -28,7 +39,10 @@ export const Matches = () => {
     useEffect(() => {
         fetch(`http://localhost:3000/matches/${userId}`)
             .then((res) => res.json())
-            .then((data: ApiMatch[]) => setMatches(data))
+            .then((data: ApiMatch[]) => {
+                // Replace, don't append; also dedupe just in case API returns duplicates
+                setMatches(uniqueByUserId(data));
+            })
             .catch((err) => console.error(err));
     }, [userId]);
 
@@ -68,14 +82,14 @@ export const Matches = () => {
                 </div>
             </div>
 
-            <div className="mx-auto flex w-full max-w-200 flex-col items-stretch gap-4">
+            <div className="flex w-full flex-col items-stretch gap-4">
                 {filtered.map((match) => (
                     <Match
                         key={match.userId}
                         name={match.name}
                         role={match.role}
                         description={match.description}
-                        currentUserId={userId}
+                        currentUserId={userId ?? 0}
                         userId={match.userId}
                         avatarUrl={match.pictures?.[0]}
                         cityTag={match.city}

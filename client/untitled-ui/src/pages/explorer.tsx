@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MarkerPin01, ArrowLeft, User01 } from "@untitledui/icons";
+import { ArrowLeft, MarkerPin01, User01 } from "@untitledui/icons";
 import { useLocation } from "react-router";
 import { LoadingIndicator } from "@/components/application/loading-indicator/loading-indicator";
 import { Avatar } from "@/components/base/avatar/avatar";
@@ -7,12 +7,20 @@ import { Button } from "@/components/base/buttons/button";
 import { UserCard } from "@/components/user_card.tsx";
 import {useUser} from "@/providers/id-provider.tsx";
 
+// Minimal profile type (must include id)
+type ProfileItem = { id: number } & Record<string, any>;
+
+export const Explorer = () => {
+    const [profiles, setProfiles] = useState<ProfileItem[]>([]);
+    const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
+    const USER_ID = 2; // hardcoded (adjust if needed)
 export const Explorer = (prompts: any) => {
     const [profiles, setProfiles] = useState([]);
     const [index, setIndex] = useState(0);
     const [avatarSrc, setAvatarSrc] = useState<string | null>(null); // added
     const USER_ID =  useUser();
     const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(true);
 
     const { state } = useLocation() as { state?: { city: string; role: string; profileId: number } };
 
@@ -24,15 +32,16 @@ export const Explorer = (prompts: any) => {
         profileId: state.profileId.toString(),
     });
 
-    console.log("Navigation state:", state, queryParams, profiles);
     useEffect(() => {
+        setLoading(true);
         fetch(`http://localhost:3000/profiles/search?${queryParams.toString()}`)
             .then((res) => res.json())
             .then((data) => {
                 setProfiles(data);
-                if (data.length === 0) setMessage("No profiles found");
+                setMessage(data.length === 0 ? "No profiles found" : "");
             })
-            .catch((err) => console.error("Błąd przy pobieraniu:", err));
+            .catch((err) => console.error("Błąd przy pobieraniu:", err))
+            .finally(() => setLoading(false));
     }, []);
 
     // Fetch avatar picture (first image id) like HomeScreenHeader
@@ -44,45 +53,55 @@ export const Explorer = (prompts: any) => {
                 if (!res.ok) return;
                 const json = await res.json();
                 let list: any[] = [];
-                if (Array.isArray(json)) list = json; else if (Array.isArray(json.pictureIds)) list = json.pictureIds; else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
-                const ids = list.map((d:any)=> (typeof d === 'number' ? d : d?.id)).filter((id:any)=> typeof id === 'number');
+                if (Array.isArray(json)) list = json;
+                else if (Array.isArray(json.pictureIds)) list = json.pictureIds;
+                else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
+                const ids = list.map((d: any) => (typeof d === "number" ? d : d?.id)).filter((id: any) => typeof id === "number");
                 if (ids.length > 0 && active) setAvatarSrc(`http://localhost:3000/picture/${ids[0]}`);
-            } catch (_) { /* silent */ }
+            } catch (_) {
+                /* silent */
+            }
         })();
-        return () => { active = false; };
+        return () => {
+            active = false;
+        };
     }, []);
 
-    if (profiles.length === 0) {
-        if (message) {
-            return <div className="text-center text-lg font-medium text-gray-500">{message}</div>;
-        } else {
-            return (
-                <div className="flex flex-col items-start gap-8 md:flex-row md:gap-16">
-                    <LoadingIndicator type="line-spinner" size="md" label="Loading..." />
-                </div>
-            );
-        }
+    if (loading) {
+        return (
+            <div className="flex flex-col items-start gap-8 md:flex-row md:gap-16">
+                <LoadingIndicator type="line-spinner" size="md" label="Loading..." />
+            </div>
+        );
     }
-    const next_profil = () => {
-        setIndex((prev) => (prev + 1) % profiles.length);
+
+    if (profiles.length === 0) {
+        return <div className="text-center text-lg font-medium text-gray-500">{message || "No profiles left"}</div>;
+    }
+
+    const update_profiles = (profileId: number) => {
+        setProfiles((prev) => {
+            const next = prev.filter((profile) => profile.id !== profileId);
+            if (next.length === 0) setMessage("No profiles left");
+            return next;
+        });
     };
 
-    function like(){
-        const profileId = profiles[index].profileId;
-        fetch("http://localhost:3000/like", {
-            method: 'POST',
-            headers: {"Content-Type": "application/json"},
+    function like(profileId: number) {
+        fetch("/like", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                "likerRole": state?.role,
-                "likerId": state?.profileId,
-                "profileId": profileId,
-            })
-        })
-     }
+                likerRole: state?.role,
+                likerId: state?.profileId,
+                profileId,
+            }),
+        });
+    }
 
     return (
         <div className="rows items-center justify-center gap-2">
-            <div className="shadow-gray-1000/1000 m-7 rounded-3xl bg-white shadow-md m-2">
+            <div className="shadow-gray-1000/1000 m-2 m-7 rounded-3xl bg-white shadow-md">
                 <div className="flex w-full items-center justify-center p-1">
                     <button onClick={() => (window.location.href = "/")} className="rounded-full p-2 hover:bg-gray-100">
                         <ArrowLeft className="h-5 w-5" />
@@ -97,20 +116,27 @@ export const Explorer = (prompts: any) => {
                 </div>
             </div>
             <div className="row flex items-center justify-center">
-                <UserCard profil={profiles[index]}></UserCard>
+                <UserCard profil={profiles[0]}></UserCard>
             </div>
             <div className="absolute right-0 bottom-0 left-0 my-5 flex w-full items-center gap-4 p-4">
-                <Button className="border-color-grey-500 text-color-black w-9/20 bg-white" onClick={() =>{
-                    next_profil()
-                    }
-                }>
+                <Button
+                    className="border-color-grey-500 text-color-black w-9/20 bg-white"
+                    onClick={() => {
+                        const current = profiles[0];
+                        if (!current) return;
+                        update_profiles(current.id);
+                    }}
+                >
                     Skip
                 </Button>
-                <Button className="border-color-500 w-9/20 bg-orange-500" onClick={ ()=>
-                {
-                    like()
-                    next_profil()
-                }}
+                <Button
+                    className="border-color-500 w-10/20 bg-orange-500"
+                    onClick={() => {
+                        const current = profiles[0];
+                        if (!current) return;
+                        update_profiles(current.id);
+                        like(current.id);
+                    }}
                 >
                     Like
                 </Button>
