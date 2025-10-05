@@ -1,5 +1,5 @@
 import express from "express";
-import { Picture, User } from "../models/index.js";
+import { Picture, Profile, Review, User } from "../models/index.js";
 
 const router = express.Router();
 
@@ -10,6 +10,50 @@ router.get("/user/:id", async (req,res)=>{
     res.json(profile);
 
 });
+
+router.get("/user/:id/profile", async (req, res) => {
+    try {
+      const userId = req.params.id;
+  
+      // Find the profile for the specific user (and include User + Pictures)
+      const profile = await Profile.findOne({
+        where: { userId },
+        include: [{ model: User, include: [Picture] }],
+      });
+  
+      if (!profile) {
+        return res.status(404).json({ error: "Profile not found" });
+      }
+  
+      // Find all reviews for this profile
+      const reviews = await Review.findAll({
+        where: { receiverId: profile.id },
+      });
+  
+      // Calculate average rating
+      const avg =
+        reviews.reduce((sum, it) => sum + it.rating, 0) / (reviews.length || 1);
+  
+      // Format the response
+      const profileResponse = {
+        name: profile.User.name,
+        age: profile.User.age,
+        city: profile.city,
+        pictures: profile.User.Pictures.map((pic) => pic.value),
+        role: profile.role,
+        traits: Array.isArray(profile.traits) ? profile.traits : [],
+        averageRating: avg || 0,
+        description: profile.description || "",
+        country: profile.User.country || "",
+      };
+  
+      res.status(200).json(profileResponse);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+  
 
 
 

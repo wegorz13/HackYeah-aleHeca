@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import { MarkerPin01 } from "@untitledui/icons";
 import AutosuggestInput from "./autosuggestInput";
 import { HomeScreenHeader } from "./homse-screen-header";
 import { Trips } from "./trips";
+import { useNavigate } from "react-router";
+import { HomeMatches } from "./home-matches";
 
 export const HomeScreen = () => {
     const [cities, setCities] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetch(`http://localhost:3000/cities`)
@@ -13,6 +16,9 @@ export const HomeScreen = () => {
             .then((data) => setCities(data))
             .catch((err) => console.error(err));
     }, []);
+    
+
+    const onSelect = (value) => { console.log(value);navigate(`/create-profile/${value.label}`);}; 
 
     const cityName = cities.map((city) => city.name);
     console.log(cityName);
@@ -28,16 +34,17 @@ export const HomeScreen = () => {
                     <AutosuggestInput
                         placeholder="Where do you want to go?"
                         className="w-80 rounded-xl"
+                        onSelect={onSelect}
                         inputClassName="bg-white border-0 focus:ring-0 shadow-none"
                         leftIcon={<MarkerPin01 className="h-4 w-4 text-gray-500" />}
                         getSuggestions={(q) => {
                             return cityName.filter((x) => x.toLowerCase().includes(q.toLowerCase())).map((label, i) => ({ id: i, label }));
                         }}
-                        onSelect={(item) => console.log("selected", item)}
                     />
                 </div>
 
                 <Trips />
+                        <HomeMatches />
             </div>
         </div>
     );

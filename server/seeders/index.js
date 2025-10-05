@@ -16,17 +16,42 @@ export default async function seedDatabase() {
 
   // Cities
   const cities = await City.bulkCreate(
-    Array.from({ length: 10 }).map((_, i) => ({ name: `City ${i + 1}` }))
+    [
+      "Tokyo",
+      "Rio de Janeiro",
+      "Toronto",
+      "Berlin",
+      "Cape Town",
+      "Mumbai",
+      "Sydney",
+      "Rome",
+      "Mexico City",
+      "Cairo"
+    ].map((n) => ({ name: n}))
   );
 
   // Countries
   const countries = await Country.bulkCreate(
-    Array.from({ length: 10 }).map((_, i) => ({ name: `Country ${i + 1}` }))
+    [
+      "Japan",
+      "Brazil",
+      "Canada",
+      "Germany",
+      "South Africa",
+      "India",
+      "Australia",
+      "Italy",
+      "Mexico",
+      "Egypt"
+    ].map((n) => ({ name:  n}))
   );
 
   // Traits (names)
   const traitNames = ["Couch-surf", "Sports", "Art", "Pottery", "BeerBuddy"];
   await Trait.bulkCreate(traitNames.map((t) => ({ name: t })));
+
+  // Cities
+  const dates = Array.from({ length: 10 }).map((_, i) => `Date ${i + 1}`);
 
   // Users + Pictures
   const users = [];
@@ -69,6 +94,7 @@ export default async function seedDatabase() {
       role: faker.helpers.arrayElement(["mentor", "traveller"]),
       traits: traitsForProfile, // names
       description: faker.lorem.sentence(),
+      date: faker.helpers.arrayElement(dates),
     });
 
     profiles.push(profile);

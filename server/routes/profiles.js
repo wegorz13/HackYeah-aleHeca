@@ -1,6 +1,6 @@
 import express from "express";
 import { Op } from "sequelize";
-import { Profile, User, Picture, Review, City } from "../models/index.js";
+import { Profile, User, Picture, Review } from "../models/index.js";
 
 const router = express.Router();
 
@@ -25,6 +25,7 @@ router.get("/profiles", async (_req, res) => {
       averageRating: avg || 0,
       description: p.description || "",
       country: p.User.country || "",
+      date: p.date || "",
     };
   });
 
@@ -55,10 +56,27 @@ router.get("/profiles/search", async (req, res) => {
     const oppositeRole =
       profileArg.role === "traveller" ? "mentor" : "traveller";
 
-    const profiles = await Profile.findAll({
-      where: { role: oppositeRole, city: profileArg.city },
-      include: [{ model: User, include: [Picture] }],
-    });
+    let profiles = null;
+
+    //mentos look:
+    if (profileArg.role == "mentor") {
+      const matches = await Match.findAll({
+        where: { mentorId: profileArg.mentorId, receivedPositive: false },
+        attributes: ["travellerId"],
+      });
+
+      const travellersList = matches.map((m) => m.travellerId);
+      console.log(travellersList);
+      profiles = await Profile.findAll({
+        where: { userId: { [Op.in]: travellersList }, city: profileArg.city },
+        include: [{ model: User, include: [Picture] }],
+      });
+    } else {
+      profiles = await Profile.findAll({
+        where: { role: oppositeRole, city: profileArg.city },
+        include: [{ model: User, include: [Picture] }],
+      });
+    }
 
     const profileIds = profiles.map((p) => p.id);
 
@@ -74,12 +92,13 @@ router.get("/profiles/search", async (req, res) => {
         name: p.User.name,
         age: p.User.age,
         city: p.city,
-        pictures: p.User.Pictures.map((pic) => pic.value),
+        pictures: p.User.Pictures.map((pic) => pic.id),
         role: p.role,
         traits: Array.isArray(p.traits) ? p.traits : [],
         averageRating: avg || 0,
         description: p.description || "",
         country: p.User.country || "",
+        date: p.date || "",
       };
     });
 
@@ -124,6 +143,7 @@ router.get("/profiles/:id", async (req, res) => {
     city: profile.city,
     traits: profile.traits || [],
     description: profile.description,
+    date: profile.date || "",
   }));
 
   res.json(profilesResponse);
