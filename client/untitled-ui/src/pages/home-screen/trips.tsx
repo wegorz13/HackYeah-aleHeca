@@ -17,7 +17,9 @@ export const Trips = () => {
     console.log(profiles[0]);
     return (
         <div className="justify-begin flex max-w-89 flex-col items-center items-start gap-4 p-4 font-bold">
-            Planing my trips
+            <div className="flex items-center justify-center ">
+                My trips
+                </div>
             {profiles.map((profile) => (
                 <Trip city={profile.city} role={profile.role} profileId={profile.id}></Trip>
             ))}

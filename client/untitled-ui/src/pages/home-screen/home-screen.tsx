@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import AutosuggestInput from "./autosuggestInput";
 import { HomeMatches } from "./home-matches";
 import { HomeScreenHeader } from "./homse-screen-header";
-import { Trips } from "./trips";
+import { YourTrips } from "./your-trips";
 
 export const HomeScreen = () => {
     const [cities, setCities] = useState([]);
@@ -49,7 +49,8 @@ export const HomeScreen = () => {
      
                 </div>
 
-                <Trips />
+                <YourTrips />
+       
                 <HomeMatches />
             </div>
         </div>

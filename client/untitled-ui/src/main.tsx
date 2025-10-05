@@ -7,6 +7,7 @@ import { Explorer } from "@/pages/explorer.tsx";
 import { HomeScreen } from "@/pages/home-screen/home-screen";
 import { Matches } from "@/pages/matches/matches";
 import { Profile } from "@/pages/profil/profile";
+import { Trips } from "@/pages/home-screen/trips";
 import { UserProvider } from "@/providers/id-provider";
 import { RouteProvider } from "@/providers/router-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
@@ -23,6 +24,7 @@ createRoot(document.getElementById("root")!).render(
                             <Route path="/explorer" element={<Explorer />} />
                             <Route path="/" element={<HomeScreen />} />
                             <Route path="/profile" element={<Profile />} />
+                             <Route path="/trips" element={<Trips />} />
                             <Route path="/chat/:userId/:receiverId" element={<Chat />} />
                             <Route path="/matches" element={<Matches />} />
                             <Route path="/create-profile/:city" element={<CreateProfile />} />
