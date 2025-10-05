@@ -24,9 +24,7 @@ export default function Chat() {
     const location = useLocation() as { state?: { receiverName?: string; receiverAvatar?: string } };
 
     // Replace static receiverName with stateful value
-    const [receiverName, setReceiverName] = useState<string>(
-        location.state?.receiverName || (otherId ? `User ${otherId}` : "Chat")
-    );
+    const [receiverName, setReceiverName] = useState<string>(location.state?.receiverName || (otherId ? `User ${otherId}` : "Chat"));
     const receiverAvatar = location.state?.receiverAvatar;
     const [fetchedAvatar, setFetchedAvatar] = useState<string | null>(null); // new
 
@@ -39,12 +37,16 @@ export default function Chat() {
                 const res = await fetch(`http://localhost:3000/user/${otherId}`);
                 if (!res.ok) return;
                 const data = await res.json();
-                if (active && data?.name && typeof data.name === 'string') {
+                if (active && data?.name && typeof data.name === "string") {
                     setReceiverName(data.name);
                 }
-            } catch { /* silent */ }
+            } catch {
+                /* silent */
+            }
         })();
-        return () => { active = false; };
+        return () => {
+            active = false;
+        };
     }, [otherId]);
 
     // Fetch receiver first photo if not passed
@@ -57,12 +59,18 @@ export default function Chat() {
                 if (!res.ok) return;
                 const json = await res.json();
                 let list: any[] = [];
-                if (Array.isArray(json)) list = json; else if (Array.isArray(json.pictureIds)) list = json.pictureIds; else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
-                const ids = list.map((d:any)=> (typeof d === 'number' ? d : d?.id)).filter((id:any)=> typeof id === 'number');
+                if (Array.isArray(json)) list = json;
+                else if (Array.isArray(json.pictureIds)) list = json.pictureIds;
+                else if (Array.isArray((json as any).pictures)) list = (json as any).pictures;
+                const ids = list.map((d: any) => (typeof d === "number" ? d : d?.id)).filter((id: any) => typeof id === "number");
                 if (active && ids.length > 0) setFetchedAvatar(`http://localhost:3000/picture/${ids[0]}`);
-            } catch { /* silent */ }
+            } catch {
+                /* silent */
+            }
         })();
-        return () => { active = false; };
+        return () => {
+            active = false;
+        };
     }, [receiverAvatar, otherId]);
 
     const navigate = useNavigate();
@@ -119,7 +127,7 @@ export default function Chat() {
     const formatTime = (ts?: number) => new Date(ts ?? Date.now()).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit", hour12: true });
 
     return (
-        <div className="flex max-w-89 h-[100dvh] flex-col bg-white">
+        <div className="flex h-[100dvh] max-w-100 flex-col bg-white">
             {/* Header */}
             <div className="sticky top-0 z-10 border-b bg-white/90 p-4 backdrop-blur">
                 <div className="relative mx-auto flex max-w-[640px] items-center justify-center">
@@ -149,7 +157,12 @@ export default function Chat() {
                                         <div className="mt-6 mr-2 h-8 w-8 shrink-0">
                                             {receiverAvatar || fetchedAvatar ? (
                                                 <div className="relative">
-                                                    <Avatar size="sm" src={(receiverAvatar || fetchedAvatar) || undefined} initials={receiverName.charAt(0)} status="online" />
+                                                    <Avatar
+                                                        size="sm"
+                                                        src={receiverAvatar || fetchedAvatar || undefined}
+                                                        initials={receiverName.charAt(0)}
+                                                        status="online"
+                                                    />
                                                 </div>
                                             ) : (
                                                 <div className="relative">
