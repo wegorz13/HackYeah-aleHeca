@@ -16,12 +16,34 @@ export default async function seedDatabase() {
 
   // Cities
   const cities = await City.bulkCreate(
-    Array.from({ length: 10 }).map((_, i) => ({ name: `City ${i + 1}` }))
+    [
+      "Tokyo",
+      "Rio de Janeiro",
+      "Toronto",
+      "Berlin",
+      "Cape Town",
+      "Mumbai",
+      "Sydney",
+      "Rome",
+      "Mexico City",
+      "Cairo"
+    ].map((n) => ({ name: n}))
   );
 
   // Countries
   const countries = await Country.bulkCreate(
-    Array.from({ length: 10 }).map((_, i) => ({ name: `Country ${i + 1}` }))
+    [
+      "Japan",
+      "Brazil",
+      "Canada",
+      "Germany",
+      "South Africa",
+      "India",
+      "Australia",
+      "Italy",
+      "Mexico",
+      "Egypt"
+    ].map((n) => ({ name:  n}))
   );
 
   // Traits (names)

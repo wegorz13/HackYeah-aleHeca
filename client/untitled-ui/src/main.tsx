@@ -11,14 +11,16 @@ import { RouteProvider } from "@/providers/router-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import "@/styles/globals.css";
 
+
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <ThemeProvider>
             <BrowserRouter>
                 <RouteProvider>
                     <Routes>
+                        <Route path="/" element={<HomeScreen />} />\
+                        <Route path="/explorer" element={<Explorer city="City 4"/>} />
                         <Route path="/" element={<HomeScreen />} />
-                        <Route path="/explorer" element={<Explorer city="ola" />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/chat/:userId/:receiverId" element={<Chat />} />
                         <Route path="/matches" element={<Matches />} />
