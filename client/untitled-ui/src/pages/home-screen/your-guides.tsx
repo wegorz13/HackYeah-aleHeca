@@ -4,7 +4,7 @@ import { Badge } from "@/components/base/badges/badges";
 import { Button } from "@/components/base/buttons/button";
 import { useUser } from "@/providers/id-provider";
 import { useNavigate } from "react-router";
-import { profile } from "console";
+
 
 export const YourGuides = () => {
     const { userId } = useUser();
@@ -39,7 +39,7 @@ export const YourGuides = () => {
                             <p className="text-sm text-gray-500">{profiles[0].date}</p>
                         </div>
                         <div className="flex flex-row items-center gap-2">
-                            <Badge className="text-orange-500">{profiles.length - 1} more trips!</Badge>
+                            <Badge className="text-orange-500">Let's guide!</Badge>
                             <Button size="sm" color="link-gray" onClick={onClick} className="text-gray-500">
                                 <ArrowRight />
                             </Button>

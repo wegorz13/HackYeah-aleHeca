@@ -10,7 +10,10 @@ export const UserCard = (prompts: any)=>{
     const description = prompts.profil.description;
     const traits = prompts.profil.traits;
     const pictures = prompts.profil.pictures[0];
+    const date = prompts.profil.date
 
+
+    console.log(prompts.profil)
 
     const url = "https://picsum.photos/300/300";
 
@@ -24,6 +27,7 @@ export const UserCard = (prompts: any)=>{
     console.log(url);
 
     return (
+
         <div className="rounded-3xl w-9/10 bg-white overflow-hidden">
             <div className="w-full h-64">
                 <img
@@ -34,7 +38,7 @@ export const UserCard = (prompts: any)=>{
             </div>
 
             <div className="p-4 border-t shadow-md shadow-gray-1000/20">
-                <div >
+                <div>
                     <div className="flex justify-between gap-3 my-1">
                         <div className="flex gap-2 items-center my-4">
                             <b>{name}</b>
@@ -46,6 +50,8 @@ export const UserCard = (prompts: any)=>{
                         </div>
                     </div>
                 </div>
+                <p>{date}</p>
+
 
                 <span className="flex bg-utility-gray-200 rounded-xl p-1 w-1/2 gap-1 items-center">
                   <MarkerPin01/>
@@ -68,7 +74,6 @@ export const UserCard = (prompts: any)=>{
                 </div>
             </div>
         </div>
-
     )
 }
 
