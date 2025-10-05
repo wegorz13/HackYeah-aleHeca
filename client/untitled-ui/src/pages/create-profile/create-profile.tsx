@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { ArrowLeft } from "@untitledui/icons";
-import { Input } from "react-aria-components";
 import { useParams } from "react-router";
 import { Badge } from "@/components/base/badges/badges";
 import { Button } from "@/components/base/buttons/button";
@@ -19,12 +18,12 @@ export const CreateProfile = () => {
     const [second, setSecond] = useState(false);
     const [third, setThird] = useState(false);
   
-     const [arriving, setArriving] = useState("");
-  const [leaving, setLeaving] = useState("");
+    const [arriving, setArriving] = useState("");
+    const [leaving, setLeaving] = useState("");
+
 
     const goNext = () => {
     if (third) {
-        console.log("udalo sie")
     }
     else if (second) {
       setThird(true);
