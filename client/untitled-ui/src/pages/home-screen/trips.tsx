@@ -60,7 +60,7 @@ export const Trips = () => {
                 </Button>                </div>
             </div>
             {profiles.map((profile) => (
-                <Trip city={profile.city} role={profile.role} profileId={profile.id}></Trip>
+                <Trip city={profile.city} role={profile.role} date={profile.date} profileId={profile.id}></Trip>
             ))}
         </div>
     );

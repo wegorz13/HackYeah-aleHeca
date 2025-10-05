@@ -7,7 +7,6 @@ import { Button } from "@/components/base/buttons/button";
 import { UserCard } from "@/components/user_card.tsx";
 import { useUser } from "@/providers/id-provider.tsx";
 
-// Minimal profile type (must include id)
 type ProfileItem = { id: number } & Record<string, any>;
 
 export const Explorer = () => {
