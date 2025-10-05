@@ -9,21 +9,23 @@ const router = express.Router();
 // Like / confirm match
 router.post("/like", async (req, res) => {
   try {
-    const { travellerId, mentorId, role } = req.body; // IDs are Profile IDs
+    const { likerRole, likerId, profileId } = req.body; // IDs are Profile IDs
     let match;
 
-    if (role === "traveller") {
+    if (likerRole === "traveller") {
       const expirationDate = new Date();
       expirationDate.setDate(expirationDate.getDate() + 30);
 
       match = await Match.create({
-        travellerId,
-        mentorId,
+        travellerId: likerId,
+        mentorId: profileId,
         receivedPositive: false,
         expirationStamp: expirationDate,
       });
-    } else if (role === "mentor") {
-      match = await Match.findOne({ where: { travellerId, mentorId } });
+    } else if (likerRole === "mentor") {
+      match = await Match.findOne({
+        where: { travellerId: profileId, mentorId: likerId },
+      });
       if (!match) return res.status(404).json({ error: "Match not found" });
       await match.update({ receivedPositive: true });
     } else {

@@ -100,6 +100,7 @@ router.get("/profiles/search", async (req, res) => {
         description: p.description || "",
         country: p.User.country || "",
         date: p.date || "",
+        profileId: p.id,
       };
     });
 
