@@ -5,12 +5,13 @@ import { LoadingIndicator } from "@/components/application/loading-indicator/loa
 import { Avatar } from "@/components/base/avatar/avatar";
 import { Button } from "@/components/base/buttons/button";
 import { UserCard } from "@/components/user_card.tsx";
+import {useUser} from "@/providers/id-provider.tsx";
 
 export const Explorer = (prompts: any) => {
     const [profiles, setProfiles] = useState([]);
     const [index, setIndex] = useState(0);
     const [avatarSrc, setAvatarSrc] = useState<string | null>(null); // added
-    const USER_ID = 2; // hardcoded (adjust if needed)
+    const USER_ID =  useUser();
     const [message, setMessage] = useState("");
 
     const { state } = useLocation() as { state?: { city: string; role: string; profileId: number } };
@@ -67,18 +68,17 @@ export const Explorer = (prompts: any) => {
     };
 
     function like(){
-        const profileId = profiles[index].id;
-
-        const response = fetch("/like",{
+        const profileId = profiles[index].profileId;
+        fetch("http://localhost:3000/like", {
             method: 'POST',
-            headers:  {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
-                "likerRole" : state?.role,
-                "LikerId" :
-                "ProfileId"
+                "likerRole": state?.role,
+                "likerId": state?.profileId,
+                "profileId": profileId,
             })
         })
-    }
+     }
 
     return (
         <div className="rows items-center justify-center gap-2">
@@ -102,13 +102,16 @@ export const Explorer = (prompts: any) => {
             <div className="absolute right-0 bottom-0 left-0 my-5 flex w-full items-center gap-4 p-4">
                 <Button className="border-color-grey-500 text-color-black w-9/20 bg-white" onClick={() =>{
                     next_profil()
-                    const profileId = profiles[index];
-                    console.log(profileId)
                     }
                 }>
                     Skip
                 </Button>
-                <Button className="border-color-500 w-9/20 bg-orange-500" onClick={() => next_profil()}>
+                <Button className="border-color-500 w-9/20 bg-orange-500" onClick={ ()=>
+                {
+                    like()
+                    next_profil()
+                }}
+                >
                     Like
                 </Button>
             </div>
