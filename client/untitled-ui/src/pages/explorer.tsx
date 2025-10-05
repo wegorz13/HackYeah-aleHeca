@@ -101,7 +101,7 @@ export const Explorer = () => {
     }
 
     return (
-        <div className="rows items-center justify-center gap-2">
+        <div className="max-w-89 rows items-center justify-center gap-2">
             <div className="shadow-gray-1000/1000 m-2 m-7 rounded-3xl bg-white shadow-md">
                 <div className="flex w-full items-center justify-center p-1">
                     <button onClick={() => (window.history.back())} className="rounded-full p-2 hover:bg-gray-100">
@@ -120,7 +120,7 @@ export const Explorer = () => {
             <div className="row flex items-center justify-center">
                 <UserCard profil={profiles[0]}></UserCard>
             </div>
-            <div className="absolute right-0 bottom-0 left-0 my-5 flex w-full items-center gap-4 p-4">
+            <div className="max-w-89 absolute right-0 bottom-0 left-0 my-5 flex w-full items-center gap-4 p-4">
                 <Button
                     className="border-color-grey-500 text-color-black w-9/20 bg-white"
                     onClick={() => {
