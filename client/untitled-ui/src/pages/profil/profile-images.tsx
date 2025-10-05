@@ -21,7 +21,7 @@ export const ProfileImages: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false); // moved here
-  const [lastUploadId, setLastUploadId] = useState<number | null>(null); // moved here
+  const [setLastUploadId] = useState<number | null>(null); // moved here
 
   async function handleImageSelect(files: FileList | null){
     if(!files || files.length === 0) return;
