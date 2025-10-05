@@ -1,20 +1,21 @@
-import { User01 } from "@untitledui/icons";
-import { useNavigate } from "react-router";
-import { Button } from "@/components/base/buttons/button";
 import { Avatar } from "@/components/base/avatar/avatar";
 import { useEffect, useState } from "react";
+import { useUser } from "@/providers/id-provider";
+import { Button } from '@/components/base/buttons/button'
+import { useNavigate } from "react-router";
+import { User01 } from "@untitledui/icons";
 
-const USER_ID = 2; // hardcoded user id (adjust if needed)
 
 export const HomeScreenHeader = () => {
-    const navigate = useNavigate();
     const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
+    const { userId } = useUser();
+    const navigate = useNavigate();
 
     useEffect(() => {
         let active = true;
         (async () => {
             try {
-                const res = await fetch(`http://localhost:3000/user/${USER_ID}/pictures`);
+                const res = await fetch(`http://localhost:3000/user/${userId}/pictures`);
                 if (!res.ok) return;
                 const json = await res.json();
                 let list: any[] = [];
@@ -38,15 +39,14 @@ export const HomeScreenHeader = () => {
 
     const onClick = () => {
         navigate("/profile");
-    };
+    }
 
     return (
-        <div className="flex flex-row items-center justify-between">
-            <div className="text-rightous flex justify-start text-2xl font-bold text-orange-500">loca</div>
-            <div className="flex justify-end">
-                <Button color="link-gray" className="p-2" noTextPadding={true} onClick={onClick}>
-                    {/* Show avatar if we have an image, else fallback icon */}
-                    {avatarSrc ? <Avatar size="md" src={avatarSrc} /> : <User01 />}
+        <div className="justify-begin flex max-w-89 flex-col items-center items-start p-4">
+            <div className="relative flex w-full items-center justify-between rounded-3xl px-4 py-3 shadow-[0_8px_12px_-6px_rgba(0,0,0,0.25)]">
+                <div className="text-rightous text-2xl font-bold text-orange-500">loca</div>
+                <Button color="link-gray" noTextPadding={true} onClick={onClick}>
+                    {avatarSrc ? <Avatar size="md" alt="User" src={avatarSrc} /> : <User01 />}
                 </Button>
             </div>
         </div>

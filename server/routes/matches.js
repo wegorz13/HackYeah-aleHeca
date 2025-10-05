@@ -54,6 +54,7 @@ router.get("/matches/:userId", async (req, res) => {
           { mentorId: { [Op.in]: profileIds } },
           { travellerId: { [Op.in]: profileIds } },
         ],
+        receivedPositive: true,
       },
       include: [
         {
