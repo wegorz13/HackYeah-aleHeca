@@ -48,7 +48,7 @@ export const Matches = () => {
 
     const filtered = useMemo(() => {
         return selectedTab === "traveling" ? matches.filter((m) => m.role === "mentor") : matches.filter((m) => m.role === "traveller");
-    }, [matches, selectedTab]);
+    }, [selectedTab]);
 
     return (
         <div className="flex max-w-100 flex-col items-center justify-center p-4">
