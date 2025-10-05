@@ -5,6 +5,7 @@ import AutosuggestInput from "./autosuggestInput";
 import { HomeMatches } from "./home-matches";
 import { HomeScreenHeader } from "./homse-screen-header";
 import { YourTrips } from "./your-trips";
+import { YourGuides } from "./your-guides";
 
 export const HomeScreen = () => {
     const [cities, setCities] = useState([]);
@@ -26,7 +27,7 @@ export const HomeScreen = () => {
     console.log(cityName);
 
     return (
-        <div className="flex max-w-89 items-center justify-center p-4">
+        <div className="flex max-w-89 items-center justify-center p-4 ">
             <div className="justify center flex max-w-200 flex-col gap-10">
                 
                 <HomeScreenHeader />
@@ -50,6 +51,7 @@ export const HomeScreen = () => {
                 </div>
 
                 <YourTrips />
+                <YourGuides />
        
                 <HomeMatches />
             </div>
