@@ -6,14 +6,6 @@ type ThirdStepProps = {
 
 };
 
-import { TextArea } from "@/components/base/textarea/textarea";
-
-type ThirdStepProps = {
-    additionalInfo: string;
-    setAdditionalInfo: (additionalInfo: string) => void;
- 
-};
-
 
 export const ThirdStep = ({additionalInfo, setAdditionalInfo}: ThirdStepProps) => {
 
